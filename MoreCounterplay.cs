@@ -1,8 +1,6 @@
 using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
-using LobbyCompatibility.Attributes;
-using LobbyCompatibility.Enums;
 using MoreCounterplay.Config;
 
 namespace MoreCounterplay;

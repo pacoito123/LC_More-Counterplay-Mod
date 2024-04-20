@@ -4,7 +4,6 @@ using System.Linq;
 using HarmonyLib;
 using MoreCounterplay.Config;
 using UnityEngine;
-using UnityEngine.PlayerLoop;
 
 namespace MoreCounterplay.Patches
 {
@@ -15,6 +14,7 @@ namespace MoreCounterplay.Patches
         [HarmonyPostfix]
         public static void SpawnItemsCollider(JesterAI __instance)
         {
+            if (!ConfigSettings.AddJesterCounterplay.Value) return;
             AddHeadCollider(__instance, "HeadCollider");
         }
 
@@ -22,6 +22,7 @@ namespace MoreCounterplay.Patches
         [HarmonyPrefix]
         public static bool CheckJesterHead(EnemyAI __instance, int stateIndex)
         {
+            if (!ConfigSettings.AddJesterCounterplay.Value) return true;
             if (__instance.GetType() != typeof(JesterAI)) return true;
 
             float weight = Mathf.RoundToInt(Mathf.Clamp(__instance.GetComponentInChildren<JesterHeadTrigger>().GetObjectsWeight(), 0f, 100f) * 105f);

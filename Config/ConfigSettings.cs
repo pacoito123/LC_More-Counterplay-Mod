@@ -1,12 +1,13 @@
 using BepInEx.Configuration;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.IO;
-using System.Linq;
 
 namespace MoreCounterplay.Config
 {
     public static class ConfigSettings
     {
+        public static ConfigEntry<bool> AddJesterCounterplay;
         public static ConfigEntry<float> WeightToPreventJester;
 
         public static Dictionary<string, ConfigEntryBase> currentConfigEntries = new Dictionary<string, ConfigEntryBase>();
@@ -15,6 +16,7 @@ namespace MoreCounterplay.Config
         {
             MoreCounterplay.Log("BindingConfigs");
 
+            AddJesterCounterplay = AddConfigEntry(MoreCounterplay.Instance.Config.Bind("Server-side", "AddJesterCounterplay", true, "[Host only] Add counterplay for Jester."));
             WeightToPreventJester = AddConfigEntry(MoreCounterplay.Instance.Config.Bind("Server-side", "WeightToPreventJester", 30f, "[Host only] Weight of items needed to prevent Jester pop out."));
 
             TryRemoveOldConfigSettings();
