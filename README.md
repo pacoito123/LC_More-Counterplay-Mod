@@ -27,3 +27,20 @@ Mod is fully configurable so you can disable or edit counterplays that you don't
   <summary>Configs</summary>
   <i>EnableTurretCounterplay</i> - Toggle Turret counterplay.<br />
 </details>
+
+## Coilhead
+<details>
+  <summary>Spoiler</summary>
+  You can cut off Coilhead's head using knife.
+
+  <br />![](https://i.imgur.com/WtcAkJ9.jpg)
+</details>
+
+<details>
+  <summary>Configs</summary>
+  <i>EnableCoilheadCounterplay</i> - Toggle Coilhead counterplay.<br />
+  <i>CoilheadHP</i> - Set Coilhead's health points.<br />
+  <i>CoilheadDefaultDamage</i> - Amount of damage that Coilhead take from any source not specified below.<br />
+  <i>CoilheadKnifeDamage</i> - Amount of damage that Coilhead take from Knife.<br />
+  <i>CoilheadShovelDamage</i> - Amount of damage that Coilhead take from Shovel.<br />
+</details>

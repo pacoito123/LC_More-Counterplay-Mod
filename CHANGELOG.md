@@ -1,3 +1,7 @@
+## 1.2.0
+
+- Added Coilhead counterplay
+
 ## 1.1.0
 
 - Added Turret counterplay

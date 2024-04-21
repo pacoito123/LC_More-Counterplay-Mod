@@ -16,6 +16,14 @@ namespace MoreCounterplay.Config
         #region Turret
         public static ConfigEntry<bool> EnableTurretCounterplay;
         #endregion
+
+        #region Coilhead
+        public static ConfigEntry<bool> EnableCoilheadCounterplay;
+        public static ConfigEntry<int> SpringDurability;
+        public static ConfigEntry<int> CoilheadDefaultDamage;
+        public static ConfigEntry<int> CoilheadKnifeDamage;
+        public static ConfigEntry<int> CoilheadShovelDamage;
+        #endregion
         #endregion
 
         public static Dictionary<string, ConfigEntryBase> currentConfigEntries = new Dictionary<string, ConfigEntryBase>();
@@ -25,12 +33,20 @@ namespace MoreCounterplay.Config
             MoreCounterplay.Log("BindingConfigs");
 
             #region Jester
-            EnableJesterCounterplay = AddConfigEntry(MoreCounterplay.Instance.Config.Bind("Server-side", "EnableJesterCounterplay", true, "[Host only] Add counterplay for Jester."));
-            WeightToPreventJester = AddConfigEntry(MoreCounterplay.Instance.Config.Bind("Server-side", "WeightToPreventJester", 30f, "[Host only] Weight of items needed to prevent Jester pop out."));
+            EnableJesterCounterplay = AddConfigEntry(MoreCounterplay.Instance.Config.Bind("Server-side", "EnableJesterCounterplay", true, "Add counterplay for Jester."));
+            WeightToPreventJester = AddConfigEntry(MoreCounterplay.Instance.Config.Bind("Server-side", "WeightToPreventJester", 30f, "Weight of items needed to prevent Jester pop out."));
             #endregion
 
             #region Turret
-            EnableTurretCounterplay = AddConfigEntry(MoreCounterplay.Instance.Config.Bind("Server-side", "EnableTurretCounterplay", true, "[Host only] Add counterplay for Turret."));
+            EnableTurretCounterplay = AddConfigEntry(MoreCounterplay.Instance.Config.Bind("Server-side", "EnableTurretCounterplay", true, "Add counterplay for Turret."));
+            #endregion
+
+            #region Coilhead
+            EnableCoilheadCounterplay = AddConfigEntry(MoreCounterplay.Instance.Config.Bind("Server-side", "EnableCoilheadCounterplay", true, "Add counterplay for Jester"));
+            SpringDurability = AddConfigEntry(MoreCounterplay.Instance.Config.Bind("Server-side", "CoilheadHP", 3, "Set Coilhead health points. Ignore if EnableCoilheadCounterplay is set to false."));
+            CoilheadDefaultDamage = AddConfigEntry(MoreCounterplay.Instance.Config.Bind("Server-side", "CoilheadDefaultDamage", 0, "Amount of damage that Coilhead take from any source not specified below."));
+            CoilheadKnifeDamage = AddConfigEntry(MoreCounterplay.Instance.Config.Bind("Server-side", "CoilheadKnifeDamage", 1, "Amount of damage that Coilhead take from Knife."));
+            CoilheadShovelDamage = AddConfigEntry(MoreCounterplay.Instance.Config.Bind("Server-side", "CoilheadShovelDamage", 0, "Amount of damage that Coilhead take from Shovel."));
             #endregion
 
             TryRemoveOldConfigSettings();
