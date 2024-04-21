@@ -7,8 +7,16 @@ namespace MoreCounterplay.Config
 {
     public static class ConfigSettings
     {
-        public static ConfigEntry<bool> AddJesterCounterplay;
+        #region Variables
+        #region Jester
+        public static ConfigEntry<bool> EnableJesterCounterplay;
         public static ConfigEntry<float> WeightToPreventJester;
+        #endregion
+
+        #region Turret
+        public static ConfigEntry<bool> EnableTurretCounterplay;
+        #endregion
+        #endregion
 
         public static Dictionary<string, ConfigEntryBase> currentConfigEntries = new Dictionary<string, ConfigEntryBase>();
 
@@ -16,8 +24,14 @@ namespace MoreCounterplay.Config
         {
             MoreCounterplay.Log("BindingConfigs");
 
-            AddJesterCounterplay = AddConfigEntry(MoreCounterplay.Instance.Config.Bind("Server-side", "AddJesterCounterplay", true, "[Host only] Add counterplay for Jester."));
+            #region Jester
+            EnableJesterCounterplay = AddConfigEntry(MoreCounterplay.Instance.Config.Bind("Server-side", "EnableJesterCounterplay", true, "[Host only] Add counterplay for Jester."));
             WeightToPreventJester = AddConfigEntry(MoreCounterplay.Instance.Config.Bind("Server-side", "WeightToPreventJester", 30f, "[Host only] Weight of items needed to prevent Jester pop out."));
+            #endregion
+
+            #region Turret
+            EnableTurretCounterplay = AddConfigEntry(MoreCounterplay.Instance.Config.Bind("Server-side", "EnableTurretCounterplay", true, "[Host only] Add counterplay for Turret."));
+            #endregion
 
             TryRemoveOldConfigSettings();
         }

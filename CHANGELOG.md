@@ -1,3 +1,7 @@
+## 1.1.0
+
+- Added Turret counterplay
+
 ## 1.0.1
 
 - Better README
