@@ -1,3 +1,9 @@
+## 1.2.1
+
+- Added Head scrap item
+- Colheads now drops it's head on death
+- Fixed Coilhead's head disappear only for host bug
+
 ## 1.2.0
 
 - Added Coilhead counterplay

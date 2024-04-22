@@ -1,8 +1,12 @@
 ﻿using GameNetcodeStuff;
 using HarmonyLib;
 using MoreCounterplay.Config;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
+using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.UI;
 namespace MoreCounterplay.Patches
 {
     [HarmonyPatch]
@@ -49,6 +53,15 @@ namespace MoreCounterplay.Patches
             }
         }
 
+        [HarmonyPatch(typeof(EnemyAI), nameof(EnemyAI.KillEnemy))]
+        [HarmonyPostfix]
+        public static void DecapitateCoilhead(EnemyAI __instance)
+        {
+            if (!ConfigSettings.EnableCoilheadCounterplay.Value) return;
+            if (__instance.GetType() != typeof(SpringManAI)) return;
+            __instance.meshRenderers.First(mesh => mesh.name == "Head").gameObject.SetActive(false);
+        }
+
         public static void CoilheadTakeHit(EnemyAI __instance, int force)
         {
             MoreCounterplay.Log($"Coilhead hit for {force} damage");
@@ -60,7 +73,16 @@ namespace MoreCounterplay.Patches
         {
             MoreCounterplay.Log($"Coilhead killed");
             __instance.KillEnemyOnOwnerClient(false);
-            __instance.meshRenderers.First(mesh => mesh.name == "Head").gameObject.SetActive(false);
+            SpawnHead(__instance.meshRenderers.First(mesh => mesh.name == "Head").gameObject.transform.position);
+        }
+
+        public static void SpawnHead(Vector3 spawnPosition)
+        {
+            if (!ConfigSettings.DropHeadAsScrap.Value) return;
+            var headItem = GameObject.Instantiate(MoreCounterplay.HeadItem.spawnPrefab, spawnPosition, Quaternion.identity);
+            headItem.GetComponentInChildren<GrabbableObject>().SetScrapValue(Random.Range(ConfigSettings.MinHeadValue.Value, ConfigSettings.MaxHeadValue.Value));
+            headItem.GetComponentInChildren<NetworkObject>().Spawn();
+            RoundManager.Instance.SyncScrapValuesClientRpc(new NetworkObjectReference[] { headItem.GetComponent<NetworkObject>() }, new int[] { headItem.GetComponent<GrabbableObject>().scrapValue });
         }
     }
 }

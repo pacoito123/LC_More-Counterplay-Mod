@@ -23,6 +23,9 @@ namespace MoreCounterplay.Config
         public static ConfigEntry<int> CoilheadDefaultDamage;
         public static ConfigEntry<int> CoilheadKnifeDamage;
         public static ConfigEntry<int> CoilheadShovelDamage;
+        public static ConfigEntry<bool> DropHeadAsScrap;
+        public static ConfigEntry<int> MinHeadValue;
+        public static ConfigEntry<int> MaxHeadValue;
         #endregion
         #endregion
 
@@ -30,7 +33,7 @@ namespace MoreCounterplay.Config
 
         public static void BindConfigSettings()
         {
-            MoreCounterplay.Log("BindingConfigs");
+            MoreCounterplay.Log("Binding Configs");
 
             #region Jester
             EnableJesterCounterplay = AddConfigEntry(MoreCounterplay.Instance.Config.Bind("Server-side", "EnableJesterCounterplay", true, "Add counterplay for Jester."));
@@ -47,6 +50,9 @@ namespace MoreCounterplay.Config
             CoilheadDefaultDamage = AddConfigEntry(MoreCounterplay.Instance.Config.Bind("Server-side", "CoilheadDefaultDamage", 0, "Amount of damage that Coilhead take from any source not specified below."));
             CoilheadKnifeDamage = AddConfigEntry(MoreCounterplay.Instance.Config.Bind("Server-side", "CoilheadKnifeDamage", 1, "Amount of damage that Coilhead take from Knife."));
             CoilheadShovelDamage = AddConfigEntry(MoreCounterplay.Instance.Config.Bind("Server-side", "CoilheadShovelDamage", 0, "Amount of damage that Coilhead take from Shovel."));
+            DropHeadAsScrap = AddConfigEntry(MoreCounterplay.Instance.Config.Bind("Server-side", "DropHeadAsScrap", true, "Will the head drop of the Coilhead as scrap."));
+            MinHeadValue = AddConfigEntry(MoreCounterplay.Instance.Config.Bind("Server-side", "MinHeadValue", 30, "Minimum value of head item."));
+            MaxHeadValue = AddConfigEntry(MoreCounterplay.Instance.Config.Bind("Server-side", "MaxHeadValue", 70, "Maximum value of head item."));
             #endregion
 
             TryRemoveOldConfigSettings();

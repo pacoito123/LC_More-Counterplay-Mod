@@ -1,9 +1,10 @@
 {
   "name": "MoreCounterplay",
-  "version_number": "1.2.0",
+  "version_number": "1.2.1",
   "website_url": "https://github.com/karyol/More-Counterplay-Mod",
   "description": "More counterplay for some Lethal Company mobs",
   "dependencies": [
-    "BepInEx-BepInExPack-5.4.2100"
+    "BepInEx-BepInExPack-5.4.2100",
+    "Evaisa-LethalLib-0.15.1"
   ]
 }
