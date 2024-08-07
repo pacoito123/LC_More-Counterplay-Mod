@@ -2,7 +2,10 @@ using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
 using MoreCounterplay.Config;
+using MoreCounterplay.MonoBehaviours;
 using System.IO;
+using System.Reflection;
+using Unity.Netcode;
 using UnityEngine;
 
 namespace MoreCounterplay;
@@ -15,10 +18,15 @@ public class MoreCounterplay : BaseUnityPlugin
     internal new static ManualLogSource Logger { get; private set; } = null!;
     internal static Harmony? Harmony { get; set; }
 
+
     #region Assets
     public static AssetBundle? Bundle;
+    public static GameObject NetworkHandlerPreafab { get; private set; } = null!;
     public static Item HeadItem { get; private set; } = null!;
+    public static Item TurretGunItem { get; private set; } = null!;
     #endregion
+
+    public static bool IsHostOrServer => NetworkManager.Singleton.IsHost || NetworkManager.Singleton.IsServer;
 
     private void Awake()
     {
@@ -28,8 +36,29 @@ public class MoreCounterplay : BaseUnityPlugin
         LoadAssets();
         ConfigSettings.BindConfigSettings();
         Patch();
+        NetcodePatcherAwake();
 
         Logger.LogInfo($"{MyPluginInfo.PLUGIN_GUID} v{MyPluginInfo.PLUGIN_VERSION} has loaded!");
+    }
+
+    private void NetcodePatcherAwake()
+    {
+        Log($"Patching Netcode");
+        var types = Assembly.GetExecutingAssembly().GetTypes();
+
+        foreach (var type in types)
+        {
+            var methods = type.GetMethods(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
+            foreach (var method in methods)
+            {
+                var attributes = method.GetCustomAttributes(typeof(RuntimeInitializeOnLoadMethodAttribute), false);
+
+                if (attributes.Length > 0)
+                {
+                    method.Invoke(null, null);
+                }
+            }
+        }
     }
 
     private void LoadAssets()
@@ -37,7 +66,11 @@ public class MoreCounterplay : BaseUnityPlugin
         Log($"Loading Assets");
         Bundle = AssetBundle.LoadFromFile(Path.Combine(Path.GetDirectoryName(Info.Location), "morecounterplayassets"));
 
+        NetworkHandlerPreafab = Bundle.LoadAsset<GameObject>("NetworkHandler");
         HeadItem = Bundle.LoadAsset<Item>("Head.asset");
+        TurretGunItem = Bundle.LoadAsset<Item>("TurretGun.asset");
+
+        NetworkHandlerPreafab.AddComponent<PluginNetworkBehaviour>();
 
         // Head size, position, and rotation adjustments.
         HeadItem.itemSpawnsOnGround = false;
@@ -47,11 +80,14 @@ public class MoreCounterplay : BaseUnityPlugin
         HeadItem.verticalOffset = 0.1f;
 
         LethalLib.Modules.Items.RegisterItem(HeadItem); // Register as a plain item to persist when reloading the save file.
+        LethalLib.Modules.NetworkPrefabs.RegisterNetworkPrefab(NetworkHandlerPreafab);
         LethalLib.Modules.NetworkPrefabs.RegisterNetworkPrefab(HeadItem.spawnPrefab);
+        LethalLib.Modules.NetworkPrefabs.RegisterNetworkPrefab(TurretGunItem.spawnPrefab);
     }
 
     internal static void Patch()
     {
+        Log($"Patching");
         Harmony ??= new Harmony(MyPluginInfo.PLUGIN_GUID);
         Harmony.PatchAll();
     }

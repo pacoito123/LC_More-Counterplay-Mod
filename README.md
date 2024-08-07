@@ -7,7 +7,7 @@ Mod is fully configurable so you can disable or edit counterplays that you don't
   <summary>Spoiler</summary>
   You can prevent Jester from opening by putting heavy items on top of it.
 
-  <br />![](https://i.imgur.com/QcykrPl.jpg)
+  ![](https://i.imgur.com/QcykrPl.jpg)
 </details>
 
 <details>
@@ -21,6 +21,9 @@ Mod is fully configurable so you can disable or edit counterplays that you don't
   <summary>Spoiler</summary>
   You can permamently disable Turret by cutting it's cables with a knife.<br />
   When you hit Turret using knife it will start berserker mode and after that it will disable permanently.
+
+  <br />Turret gun will drop as scrap item and can be picked up.
+  <br />![](https://i.imgur.com/MDuNrWy.jpeg)
 </details>
 
 <details>

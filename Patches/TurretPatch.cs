@@ -2,6 +2,10 @@
 using MoreCounterplay.Config;
 using UnityEngine;
 using GameNetcodeStuff;
+using Unity.Netcode;
+using System.Linq;
+using System;
+using MoreCounterplay.MonoBehaviours;
 
 namespace MoreCounterplay.Patches
 {
@@ -43,6 +47,20 @@ namespace MoreCounterplay.Patches
                     __instance.bulletCollisionAudio.Stop();
                     __instance.bulletParticles.Stop();
                     __instance.mainAudio.PlayOneShot(__instance.turretDeactivate);
+
+                    if (!MoreCounterplay.IsHostOrServer) return false;
+                    if (!ConfigSettings.DropGunAsScrap.Value) return false;
+                    MoreCounterplay.Log($"Spawn turret scrap");
+
+                    var spawnPosition = __instance.transform.parent.GetComponentsInChildren<Transform>().First(child => child.name == "GunBody").position;
+                    var gunRotation = __instance.transform.parent.GetComponentsInChildren<Transform>().First(child => child.name == "GunBody").rotation;
+                    var gunItem = GameObject.Instantiate(MoreCounterplay.TurretGunItem.spawnPrefab, spawnPosition, gunRotation);
+                    gunItem.GetComponentInChildren<GrabbableObject>().SetScrapValue(UnityEngine.Random.Range(ConfigSettings.MinGunValue.Value, ConfigSettings.MaxGunValue.Value));
+                    gunItem.GetComponentInChildren<NetworkObject>().Spawn();
+                    RoundManager.Instance.SyncScrapValuesClientRpc(new NetworkObjectReference[] { gunItem.GetComponent<NetworkObject>() }, new int[] { gunItem.GetComponent<GrabbableObject>().scrapValue });
+
+                    PluginNetworkBehaviour.Instance.DisableTurretGunOnLocalClient(__instance.GetComponent<NetworkObject>());
+                    PluginNetworkBehaviour.Instance.DisableTurretGunClientRpc(__instance.GetComponent<NetworkObject>());
                 }
                 return false;
             }

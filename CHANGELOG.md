@@ -1,3 +1,7 @@
+## 1.3.0
+
+- Added Turret Gun scrap item
+
 ## 1.2.3
 
 - Coilhead's head item should no longer vanish from the ship after reloading the save file
