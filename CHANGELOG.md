@@ -1,3 +1,7 @@
+## 1.2.2
+
+- Added Turret Gun scrap item
+
 ## 1.2.1
 
 - Added Head scrap item

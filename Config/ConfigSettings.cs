@@ -15,6 +15,9 @@ namespace MoreCounterplay.Config
 
         #region Turret
         public static ConfigEntry<bool> EnableTurretCounterplay;
+        public static ConfigEntry<bool> DropGunAsScrap;
+        public static ConfigEntry<int> MinGunValue;
+        public static ConfigEntry<int> MaxGunValue;
         #endregion
 
         #region Coilhead
@@ -42,6 +45,9 @@ namespace MoreCounterplay.Config
 
             #region Turret
             EnableTurretCounterplay = AddConfigEntry(MoreCounterplay.Instance.Config.Bind("Server-side", "EnableTurretCounterplay", true, "Add counterplay for Turret."));
+            DropGunAsScrap = AddConfigEntry(MoreCounterplay.Instance.Config.Bind("Server-side", "DropGunAsScrap", true, "Will the gun drop of the Turret as scrap."));
+            MinGunValue = AddConfigEntry(MoreCounterplay.Instance.Config.Bind("Server-side", "MinGunValue", 50, "Minimum value of gun item."));
+            MaxGunValue = AddConfigEntry(MoreCounterplay.Instance.Config.Bind("Server-side", "MaxGunValue", 100, "Maximum value of gun item."));
             #endregion
 
             #region Coilhead
