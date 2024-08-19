@@ -51,4 +51,9 @@ Mod is fully configurable so you can disable or edit counterplays that you don't
   <i>MaxHeadValue</i> - Maximum value of head item.<br />
 </details>
 
+## Credits
+- [Baron Drakula](https://github.com/karyol)
+- [pacoito123](https://github.com/pacoito123)
+- Society for testing and giving new ideas.
+
 ### If you are enjoying my mods please consider supporting me [here](https://ko-fi.com/baron_drakula).
