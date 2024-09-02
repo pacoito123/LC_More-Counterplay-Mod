@@ -1,6 +1,5 @@
 using BepInEx.Configuration;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.IO;
 
 namespace MoreCounterplay.Config
@@ -26,10 +25,17 @@ namespace MoreCounterplay.Config
         public static ConfigEntry<bool> DropHeadAsScrap;
         public static ConfigEntry<int> MinHeadValue;
         public static ConfigEntry<int> MaxHeadValue;
+        public static ConfigEntry<bool> LoreAccurateCoilheads;
+        public static ConfigEntry<int> ExplosionDamage;
+        public static ConfigEntry<float> ExplosionDamageRadius;
+        public static ConfigEntry<float> ExplosionKillRadius;
+        public static ConfigEntry<float> MinExplosionTimer;
+        public static ConfigEntry<float> MaxExplosionTimer;
+        public static ConfigEntry<bool> ExplosionDestroysHead;
         #endregion
         #endregion
 
-        public static Dictionary<string, ConfigEntryBase> currentConfigEntries = new Dictionary<string, ConfigEntryBase>();
+        public static Dictionary<string, ConfigEntryBase> currentConfigEntries = [];
 
         public static void BindConfigSettings()
         {
@@ -45,14 +51,21 @@ namespace MoreCounterplay.Config
             #endregion
 
             #region Coilhead
-            EnableCoilheadCounterplay = AddConfigEntry(MoreCounterplay.Instance.Config.Bind("Server-side", "EnableCoilheadCounterplay", true, "Add counterplay for Jester"));
-            SpringDurability = AddConfigEntry(MoreCounterplay.Instance.Config.Bind("Server-side", "CoilheadHP", 3, "Set Coilhead health points. Ignore if EnableCoilheadCounterplay is set to false."));
-            CoilheadDefaultDamage = AddConfigEntry(MoreCounterplay.Instance.Config.Bind("Server-side", "CoilheadDefaultDamage", 0, "Amount of damage that Coilhead take from any source not specified below."));
-            CoilheadKnifeDamage = AddConfigEntry(MoreCounterplay.Instance.Config.Bind("Server-side", "CoilheadKnifeDamage", 1, "Amount of damage that Coilhead take from Knife."));
-            CoilheadShovelDamage = AddConfigEntry(MoreCounterplay.Instance.Config.Bind("Server-side", "CoilheadShovelDamage", 0, "Amount of damage that Coilhead take from Shovel."));
-            DropHeadAsScrap = AddConfigEntry(MoreCounterplay.Instance.Config.Bind("Server-side", "DropHeadAsScrap", true, "Will the head drop of the Coilhead as scrap."));
-            MinHeadValue = AddConfigEntry(MoreCounterplay.Instance.Config.Bind("Server-side", "MinHeadValue", 30, "Minimum value of head item."));
-            MaxHeadValue = AddConfigEntry(MoreCounterplay.Instance.Config.Bind("Server-side", "MaxHeadValue", 70, "Maximum value of head item."));
+            EnableCoilheadCounterplay = AddConfigEntry(MoreCounterplay.Instance.Config.Bind("Server-side", "EnableCoilheadCounterplay", true, "Add counterplay for Coilheads (requires restart). Required by settings below."));
+            SpringDurability = AddConfigEntry(MoreCounterplay.Instance.Config.Bind("Server-side", "SpringDurability", 3, "Set Coilhead health points (requires restart)."));
+            CoilheadDefaultDamage = AddConfigEntry(MoreCounterplay.Instance.Config.Bind("Server-side", "CoilheadDefaultDamage", 0, "Amount of damage that Coilheads take from any source not specified below."));
+            CoilheadKnifeDamage = AddConfigEntry(MoreCounterplay.Instance.Config.Bind("Server-side", "CoilheadKnifeDamage", 1, "Amount of damage that Coilheads take from Knife."));
+            CoilheadShovelDamage = AddConfigEntry(MoreCounterplay.Instance.Config.Bind("Server-side", "CoilheadShovelDamage", 0, "Amount of damage that Coilheads take from Shovel."));
+            DropHeadAsScrap = AddConfigEntry(MoreCounterplay.Instance.Config.Bind("Server-side", "DropHeadAsScrap", true, "Enable the Coilhead head scrap item spawning on death (requires restart)."));
+            MinHeadValue = AddConfigEntry(MoreCounterplay.Instance.Config.Bind("Server-side", "MinHeadValue", 30, "Minimum value of the Coilhead head item."));
+            MaxHeadValue = AddConfigEntry(MoreCounterplay.Instance.Config.Bind("Server-side", "MaxHeadValue", 70, "Maximum value of the Coilhead head item."));
+            LoreAccurateCoilheads = AddConfigEntry(MoreCounterplay.Instance.Config.Bind("Server-side", "LoreAccurateCoilheads", true, "Enable lore accurate (volatile) Coilhead counterplay (requires restart). Required by settings below."));
+            ExplosionDamage = AddConfigEntry(MoreCounterplay.Instance.Config.Bind("Server-side", "ExplosionDamage", 50, "Amount of damage the Coilhead explosion deals."));
+            ExplosionDamageRadius = AddConfigEntry(MoreCounterplay.Instance.Config.Bind("Server-side", "ExplosionDamageRadius", 4f, "Radius of the Coilhead explosion damage zone."));
+            ExplosionKillRadius = AddConfigEntry(MoreCounterplay.Instance.Config.Bind("Server-side", "ExplosionKillRadius", 2f, "Radius of the Coilhead explosion kill zone."));
+            MinExplosionTimer = AddConfigEntry(MoreCounterplay.Instance.Config.Bind("Server-side", "MinExplosionTimer", 0.5f, "Minimum time until Coilhead explosion."));
+            MaxExplosionTimer = AddConfigEntry(MoreCounterplay.Instance.Config.Bind("Server-side", "MaxExplosionTimer", 5f, "Maximum time until Coilhead explosion."));
+            ExplosionDestroysHead = AddConfigEntry(MoreCounterplay.Instance.Config.Bind("Server-side", "ExplosionDestroysHead", true, "Destroy Coilhead scrap head if still attached during explosion."));
             #endregion
 
             TryRemoveOldConfigSettings();
@@ -66,8 +79,8 @@ namespace MoreCounterplay.Config
 
         public static void TryRemoveOldConfigSettings()
         {
-            HashSet<string> headers = new HashSet<string>();
-            HashSet<string> keys = new HashSet<string>();
+            HashSet<string> headers = [];
+            HashSet<string> keys = [];
 
             foreach (ConfigEntryBase entry in currentConfigEntries.Values)
             {
@@ -124,7 +137,7 @@ namespace MoreCounterplay.Config
                                         contents = contents.Remove(index0, index1 - index0);
                                     }
                                 }
-                                i += (numLinesEntry - 1);
+                                i += numLinesEntry - 1;
                             }
                             else if (lines[i].Length > 3)
                                 contents = contents.Replace(lines[i], "");

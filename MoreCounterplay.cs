@@ -1,8 +1,12 @@
 using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
+using MoreCounterplay.Behaviours;
 using MoreCounterplay.Config;
+using MoreCounterplay.Items;
+using System;
 using System.IO;
+using System.Reflection;
 using UnityEngine;
 
 namespace MoreCounterplay;
@@ -15,16 +19,14 @@ public class MoreCounterplay : BaseUnityPlugin
     internal new static ManualLogSource Logger { get; private set; } = null!;
     internal static Harmony? Harmony { get; set; }
 
-    #region Assets
     public static AssetBundle? Bundle;
-    public static Item HeadItem { get; private set; } = null!;
-    #endregion
 
     private void Awake()
     {
         Logger = base.Logger;
         Instance = this;
 
+        NetcodePatcher();
         LoadAssets();
         ConfigSettings.BindConfigSettings();
         Patch();
@@ -34,26 +36,42 @@ public class MoreCounterplay : BaseUnityPlugin
 
     private void LoadAssets()
     {
-        Log($"Loading Assets");
+        Log($"Loading Assets...");
         Bundle = AssetBundle.LoadFromFile(Path.Combine(Path.GetDirectoryName(Info.Location), "morecounterplayassets"));
 
-        HeadItem = Bundle.LoadAsset<Item>("Head.asset");
+        // Load 'Coilless Coilhead' prefab.
+        Item headProperties = Bundle.LoadAsset<Item>("CoillessCoilhead.asset");
 
-        // Head size, position, and rotation adjustments.
-        HeadItem.itemSpawnsOnGround = false;
-        HeadItem.restingRotation = new Vector3(-90, 0, 90);
-        HeadItem.spawnPrefab.transform.localScale = new Vector3(0.1763f, 0.1763f, 0.1763f);
-        HeadItem.spawnPrefab.transform.rotation *= Quaternion.Euler(-90f, 0f, 0f);
-        HeadItem.verticalOffset = 0.1f;
+        // Add HeadItem component to 'Coilless Coilhead' prefab.
+        headProperties.spawnPrefab.AddComponent<HeadItem>().itemProperties = headProperties;
+        HeadItem.Prefab = headProperties.spawnPrefab;
 
-        LethalLib.Modules.Items.RegisterItem(HeadItem); // Register as a plain item to persist when reloading the save file.
-        LethalLib.Modules.NetworkPrefabs.RegisterNetworkPrefab(HeadItem.spawnPrefab);
+        // Load radioactive fire particle effects prefab.
+        CoilExplosion.RadioactiveFirePrefab = Bundle.LoadAsset<GameObject>("RadioactiveFire.prefab");
+
+        // Register 'Coilless Coilhead' as both a plain item and a network object.
+        LethalLib.Modules.Items.RegisterItem(headProperties);
+        LethalLib.Modules.NetworkPrefabs.RegisterNetworkPrefab(headProperties.spawnPrefab);
     }
 
     internal static void Patch()
     {
         Harmony ??= new Harmony(MyPluginInfo.PLUGIN_GUID);
         Harmony.PatchAll();
+    }
+
+    private static void NetcodePatcher()
+    {
+        foreach (Type type in Assembly.GetExecutingAssembly().GetTypes())
+        {
+            foreach (MethodInfo method in type.GetMethods(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static))
+            {
+                if (method.GetCustomAttributes(typeof(RuntimeInitializeOnLoadMethodAttribute), false).Length > 0)
+                {
+                    method.Invoke(null, null);
+                }
+            }
+        }
     }
 
     public static void Log(string message) => Logger.LogInfo(message);
