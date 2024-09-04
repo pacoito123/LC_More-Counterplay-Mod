@@ -1,4 +1,3 @@
-using MoreCounterplay.Config;
 using MoreCounterplay.Items;
 using Unity.Netcode;
 using UnityEngine;
@@ -10,6 +9,11 @@ namespace MoreCounterplay.Behaviours
 	/// </summary>
 	internal class CoilExplosion : NetworkBehaviour
 	{
+		/// <summary>
+		/// 	Vanilla prefab for the Coilhead.
+		/// </summary>
+		public static GameObject? CoilheadPrefab { get; internal set; }
+
 		/// <summary>
 		/// 	Prefab for the radioactive fire particle effects.
 		/// </summary>
@@ -73,7 +77,7 @@ namespace MoreCounterplay.Behaviours
 			{
 				// Attempt to destroy 'Coilless Coilhead' scrap item if still attached.
 				AttachedItem? attachedItem = HeadContainer?.GetComponent<AttachedItem>();
-				if (attachedItem != null && attachedItem.IsAttached && !attachedItem.heldByPlayerOnServer && ConfigSettings.ExplosionDestroysHead.Value)
+				if (attachedItem != null && attachedItem.IsAttached && !attachedItem.heldByPlayerOnServer && MoreCounterplay.Settings.ExplosionDestroysHead)
 				{
 					HeadContainer?.GetComponent<NetworkObject>().Despawn();
 				}
@@ -106,10 +110,10 @@ namespace MoreCounterplay.Behaviours
 		private void SpawnExplosionClientRpc()
 		{
 			// Spawn explosion.
-			Landmine.SpawnExplosion(transform.position, true, ConfigSettings.ExplosionKillRadius.Value,
-				ConfigSettings.ExplosionDamageRadius.Value, ConfigSettings.ExplosionDamage.Value);
+			Landmine.SpawnExplosion(transform.position, true, MoreCounterplay.Settings.ExplosionKillRadius,
+				MoreCounterplay.Settings.ExplosionDamageRadius, MoreCounterplay.Settings.ExplosionDamage);
 
-            // Boioioioing.
+			// Boioioioing.
 			Coilhead?.DoSpringAnimation(true);
 
 			// Disable radioactive fire particles.
@@ -122,7 +126,7 @@ namespace MoreCounterplay.Behaviours
 		[ClientRpc]
 		private void PlaySfxClientRpc()
 		{
-			// Play unused 'Spring1.ogg' sound effect, or "EnterCooldown.ogg" sound effect if the former is not found.
+			// Play unused 'Spring1.ogg' sound effect, or 'EnterCooldown.ogg' sound effect if the former is not found.
 			Coilhead?.creatureVoice.PlayOneShot(HeadItem.Prefab?.GetComponent<HeadItem>().itemProperties.throwSFX ?? Coilhead?.enterCooldownSFX);
 		}
 

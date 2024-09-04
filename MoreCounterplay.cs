@@ -13,22 +13,25 @@ namespace MoreCounterplay;
 
 [BepInPlugin(MyPluginInfo.PLUGIN_GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
 [BepInDependency(LethalLib.Plugin.ModGUID, BepInDependency.DependencyFlags.HardDependency)]
+[BepInDependency("com.sigurd.csync", "5.0.1")]
 public class MoreCounterplay : BaseUnityPlugin
 {
     public static MoreCounterplay Instance { get; private set; } = null!;
     internal new static ManualLogSource Logger { get; private set; } = null!;
-    internal static Harmony? Harmony { get; set; }
+    internal static Harmony Harmony { get; set; } = null!;
+    internal static ConfigSettings Settings { get; set; } = null!;
 
     public static AssetBundle? Bundle;
 
     private void Awake()
     {
-        Logger = base.Logger;
         Instance = this;
+        Logger = base.Logger;
+
+        Settings = new ConfigSettings(Config);
 
         NetcodePatcher();
         LoadAssets();
-        ConfigSettings.BindConfigSettings();
         Patch();
 
         Logger.LogInfo($"{MyPluginInfo.PLUGIN_GUID} v{MyPluginInfo.PLUGIN_VERSION} has loaded!");

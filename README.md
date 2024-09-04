@@ -2,6 +2,8 @@
 
 Mod is fully configurable so you can disable or edit counterplays that you don't like.
 
+- Uses [CSync v5.0.1](https://thunderstore.io/c/lethal-company/p/Sigurd/CSync) by [Lordfirespeed](https://github.com/Lordfirespeed) to sync configuration settings between host and clients.
+
 ## Supported Enemies
 
 ### Jester
@@ -88,6 +90,23 @@ You can cut off a Coilhead's head using a knife. Its head will become a scrap it
 - `MinHeadValue` - Minimum value of head item.
 - `MaxHeadValue` - Maximum value of head item.
 - `LoreAccurateCoilheads` - See above for more info.
+
+</details>
+
+---
+
+### Ghost Girl (planned)
+
+<details>
+ <summary>Spoiler (WIP)</summary>
+
+ Implements the popular myth involving the Shower furniture item, where taking a shower is said to reduce insanity levels and repel the Ghost Girl, as an actual gameplay mechanic.
+</details>
+
+<details>
+ <summary>Configs (WIP)</summary>
+
+- `EnableGhostGirlCounterplay` - Add counterplay for the Ghost Girl.
 
 </details>
 

@@ -3,6 +3,7 @@
 ## 1.3.0
 
 <ul>
+ <li>Added <a href="https://thunderstore.io/c/lethal-company/p/Sigurd/CSync">CSync v5</a> as a dependency to ensure config parity between host and clients.</li>
  <li>Added "lore accurate" Coilhead counterplay (configurable):
   <ul>
    <li>
@@ -42,8 +43,7 @@
 </ul>
 
 - Coilheads can no longer be decapitated while in their cooldown state (they protect their necks!)
-- Coilhead damage should now apply properly between clients, whereas previously Coilheads would take damage separately even with the same settings
-  - **NOTE:** The configuration for Coilhead HP and individual weapon damage is (for the moment) not synced between clients, and players should still be using the same settings to avoid any possible desyncs
+- Coilhead damage should now apply properly for all clients, whereas previously Coilheads would take damage separately even with the same settings
 - Renamed Coilhead head item to "Coilless Coilhead"
 - Changed "Coilless Coilhead" item sound effects a bit
 - Fixed "Coilless Coilhead" item not being properly rotated when held

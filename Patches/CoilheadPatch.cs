@@ -1,6 +1,5 @@
 ﻿using HarmonyLib;
 using MoreCounterplay.Behaviours;
-using MoreCounterplay.Config;
 using MoreCounterplay.Items;
 using System.Linq;
 using Unity.Netcode;
@@ -18,7 +17,7 @@ namespace MoreCounterplay.Patches
         [HarmonyPostfix]
         private static void HitCoilhead(EnemyAI __instance, int hitID = -1)
         {
-            if (!ConfigSettings.EnableCoilheadCounterplay.Value) return;
+            if (!MoreCounterplay.Settings.EnableCoilheadCounterplay) return;
             if (__instance.isEnemyDead || __instance.GetType() != typeof(SpringManAI)) return;
 
             // Negate damage while the Coilhead is on cooldown.
@@ -31,9 +30,9 @@ namespace MoreCounterplay.Patches
             // Obtain damage dealt from config file.
             int force = hitID switch
             {
-                KNIFE_HIT_ID => ConfigSettings.CoilheadKnifeDamage.Value,
-                SHOVEL_HIT_ID => ConfigSettings.CoilheadShovelDamage.Value,
-                _ => ConfigSettings.CoilheadDefaultDamage.Value,
+                KNIFE_HIT_ID => MoreCounterplay.Settings.CoilheadKnifeDamage,
+                SHOVEL_HIT_ID => MoreCounterplay.Settings.CoilheadShovelDamage,
+                _ => MoreCounterplay.Settings.CoilheadDefaultDamage,
             };
 
             // Apply damage and kill on client if health drops below zero.
@@ -50,7 +49,7 @@ namespace MoreCounterplay.Patches
         [HarmonyPostfix]
         private static void KillCoilhead(EnemyAI __instance)
         {
-            if (!ConfigSettings.EnableCoilheadCounterplay.Value) return;
+            if (!MoreCounterplay.Settings.EnableCoilheadCounterplay) return;
             if (__instance.GetType() != typeof(SpringManAI)) return;
             SpringManAI coilhead = (SpringManAI)__instance;
 
@@ -89,7 +88,7 @@ namespace MoreCounterplay.Patches
         /// <returns>The spawned 'Coilless Coilhead' instance.</returns>
         private static GameObject? SpawnHead(SpringManAI coilhead)
         {
-            if ((!coilhead.IsServer && !coilhead.IsHost) || !ConfigSettings.DropHeadAsScrap.Value) return null;
+            if ((!coilhead.IsServer && !coilhead.IsHost) || !MoreCounterplay.Settings.DropHeadAsScrap) return null;
 
             if (HeadItem.Prefab == null)
             {
@@ -109,7 +108,7 @@ namespace MoreCounterplay.Patches
 
             // Assign scrap value and attach to original head.
             HeadItem headItem = scrapHead.GetComponent<HeadItem>();
-            headItem.SetScrapValue(HeadItem.Random.Next(ConfigSettings.MinHeadValue.Value, ConfigSettings.MaxHeadValue.Value + 1));
+            headItem.SetScrapValue(HeadItem.Random.Next(MoreCounterplay.Settings.MinHeadValue, MoreCounterplay.Settings.MaxHeadValue + 1));
             headItem.AttachItemClientRpc(coilhead.thisNetworkObject);
 
             // Sync scrap values with clients.
@@ -125,7 +124,7 @@ namespace MoreCounterplay.Patches
         /// <param name="scrapHead">The 'Coilless Coilhead' instance to (possibly) destroy.</param>
         private static void IgniteCoilhead(SpringManAI coilhead, GameObject? scrapHead)
         {
-            if (!ConfigSettings.LoreAccurateCoilheads.Value) return;
+            if (!MoreCounterplay.Settings.LoreAccurateCoilheads) return;
 
             // Enable radioactive fire particle effects.
             coilhead.gameObject.transform.Find("SpringManModel/RadioactiveFire")?.gameObject.SetActive(true);
@@ -141,7 +140,7 @@ namespace MoreCounterplay.Patches
             coilExplosion.UpdateScanNodeClientRpc(true);
 
             // Set explosion timer to how long the Coilhead last moved for, clamped to configuration values.
-            coilExplosion.TimeLeft = Mathf.Clamp(coilExplosion.TimeSinceLastStop, ConfigSettings.MinExplosionTimer.Value, ConfigSettings.MaxExplosionTimer.Value);
+            coilExplosion.TimeLeft = Mathf.Clamp(coilExplosion.TimeSinceLastStop, MoreCounterplay.Settings.MinExplosionTimer, MoreCounterplay.Settings.MaxExplosionTimer);
             coilExplosion.Ticking = true; // Run.
             coilExplosion.enabled = true;
         }
@@ -150,7 +149,7 @@ namespace MoreCounterplay.Patches
         [HarmonyPostfix]
         private static void OnStartedMoving(SpringManAI __instance)
         {
-            if ((!__instance.IsServer && !__instance.IsHost) || !ConfigSettings.LoreAccurateCoilheads.Value) return;
+            if ((!__instance.IsServer && !__instance.IsHost) || !MoreCounterplay.Settings.LoreAccurateCoilheads) return;
 
             // Reset timer since last stop and start updating it.
             CoilExplosion coilExplosion = __instance.GetComponent<CoilExplosion>();
@@ -162,7 +161,7 @@ namespace MoreCounterplay.Patches
         [HarmonyPostfix]
         private static void OnStoppedMoving(SpringManAI __instance)
         {
-            if ((!__instance.IsServer && !__instance.IsHost) || !ConfigSettings.LoreAccurateCoilheads.Value) return;
+            if ((!__instance.IsServer && !__instance.IsHost) || !MoreCounterplay.Settings.LoreAccurateCoilheads) return;
 
             // Stop updating time since last stop.
             __instance.GetComponent<CoilExplosion>().enabled = false;
