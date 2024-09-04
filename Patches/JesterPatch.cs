@@ -1,8 +1,6 @@
-using System;
+using HarmonyLib;
 using System.Collections.Generic;
 using System.Linq;
-using HarmonyLib;
-using MoreCounterplay.Config;
 using UnityEngine;
 
 namespace MoreCounterplay.Patches
@@ -14,7 +12,7 @@ namespace MoreCounterplay.Patches
         [HarmonyPostfix]
         public static void SpawnItemsCollider(JesterAI __instance)
         {
-            if (!ConfigSettings.EnableJesterCounterplay.Value) return;
+            if (!MoreCounterplay.Settings.EnableJesterCounterplay) return;
             AddHeadCollider(__instance, "HeadCollider");
         }
 
@@ -22,18 +20,18 @@ namespace MoreCounterplay.Patches
         [HarmonyPrefix]
         public static bool CheckJesterHead(EnemyAI __instance, int stateIndex)
         {
-            if (!ConfigSettings.EnableJesterCounterplay.Value) return true;
+            if (!MoreCounterplay.Settings.EnableJesterCounterplay) return true;
             if (__instance.GetType() != typeof(JesterAI)) return true;
 
             float weight = Mathf.RoundToInt(Mathf.Clamp(__instance.GetComponentInChildren<JesterHeadTrigger>().GetObjectsWeight(), 0f, 100f) * 105f);
 
-            if (stateIndex == 2 && weight >= ConfigSettings.WeightToPreventJester.Value)
+            if (stateIndex == 2 && weight >= MoreCounterplay.Settings.WeightToPreventJester)
             {
                 PreventJesterPopOut((JesterAI)__instance);
                 return false;
             }
 
-            if (stateIndex == 2 && weight < ConfigSettings.WeightToPreventJester.Value)
+            if (stateIndex == 2 && weight < MoreCounterplay.Settings.WeightToPreventJester)
             {
                 __instance.GetComponentInChildren<JesterHeadTrigger>().DropAllItems();
                 return true;
@@ -53,7 +51,7 @@ namespace MoreCounterplay.Patches
 
         public static GameObject AddHeadCollider(JesterAI __instance, string name)
         {
-            GameObject headCollider = new GameObject(name, typeof(BoxCollider));
+            GameObject headCollider = new(name, typeof(BoxCollider));
             headCollider.transform.SetParent(__instance.GetComponentsInChildren<Transform>().FirstOrDefault(child => child.name == "MeshContainer"));
             headCollider.transform.localPosition = new Vector3(-.004f, 2.1f, .1171f);
             headCollider.transform.localRotation = Quaternion.identity;

@@ -1,7 +1,5 @@
 ﻿using HarmonyLib;
-using MoreCounterplay.Config;
 using UnityEngine;
-using GameNetcodeStuff;
 
 namespace MoreCounterplay.Patches
 {
@@ -12,9 +10,9 @@ namespace MoreCounterplay.Patches
 
         [HarmonyPatch(typeof(Turret), "IHittable.Hit")]
         [HarmonyPostfix]
-        public static void CheckHitID(Turret __instance, int force, Vector3 hitDirection, PlayerControllerB playerWhoHit, bool playHitSFX, int hitID = -1)
+        public static void CheckHitID(Turret __instance, int hitID = -1)
         {
-            if (!ConfigSettings.EnableTurretCounterplay.Value) return;
+            if (!MoreCounterplay.Settings.EnableTurretCounterplay) return;
             if (hitID == KNIFE_HIT_ID)
             {
                 MoreCounterplay.Log($"Turret hit using knife");
@@ -27,7 +25,7 @@ namespace MoreCounterplay.Patches
         [HarmonyPrefix]
         public static bool CheckIfTurretGotDisabled(Turret __instance)
         {
-            if (!ConfigSettings.EnableTurretCounterplay.Value) return true;
+            if (!MoreCounterplay.Settings.EnableTurretCounterplay) return true;
             if (__instance.turretMode != TurretMode.Detection) return true;
 
             var turret = __instance.gameObject.GetComponent<TurretCounterplay>();
@@ -44,6 +42,7 @@ namespace MoreCounterplay.Patches
                     __instance.bulletParticles.Stop();
                     __instance.mainAudio.PlayOneShot(__instance.turretDeactivate);
                 }
+
                 return false;
             }
 
