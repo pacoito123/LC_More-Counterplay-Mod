@@ -62,7 +62,7 @@ namespace MoreCounterplay.Items
 			if (coilheadReference.TryGet(out NetworkObject coilheadNetworkObject))
 			{
 				// Obtain Coilhead's head prefab.
-				GameObject originalHead = coilheadNetworkObject.gameObject.transform.Find("SpringManModel/Head").gameObject;
+				GameObject originalHead = coilheadNetworkObject.transform.Find("SpringManModel/Head").gameObject;
 
 				// Attach head scrap item to original head object.
 				AttachTo(originalHead);

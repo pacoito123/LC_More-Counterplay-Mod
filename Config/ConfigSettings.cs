@@ -29,6 +29,7 @@ namespace MoreCounterplay.Config
         [field: SyncedEntryField] public SyncedEntry<bool> DropHeadAsScrap { get; private set; }
         [field: SyncedEntryField] public SyncedEntry<int> MinHeadValue { get; private set; }
         [field: SyncedEntryField] public SyncedEntry<int> MaxHeadValue { get; private set; }
+
         [field: SyncedEntryField] public SyncedEntry<bool> LoreAccurateCoilheads { get; private set; }
         [field: SyncedEntryField] public SyncedEntry<int> ExplosionDamage { get; private set; }
         [field: SyncedEntryField] public SyncedEntry<float> ExplosionDamageRadius { get; private set; }
@@ -36,6 +37,12 @@ namespace MoreCounterplay.Config
         [field: SyncedEntryField] public SyncedEntry<float> MinExplosionTimer { get; private set; }
         [field: SyncedEntryField] public SyncedEntry<float> MaxExplosionTimer { get; private set; }
         [field: SyncedEntryField] public SyncedEntry<bool> ExplosionDestroysHead { get; private set; }
+
+        public ConfigEntry<bool> ExplosionFire { get; private set; }
+        public ConfigEntry<bool> ExplosionParticles { get; private set; }
+        public ConfigEntry<float> ExplosionWarnVolume { get; private set; }
+        public ConfigEntry<bool> EnableCoilheadScanNode { get; private set; }
+        public ConfigEntry<bool> ModifyCoilheadScanNode { get; private set; }
         #endregion
         #endregion
 
@@ -45,31 +52,38 @@ namespace MoreCounterplay.Config
             config.SaveOnConfigSet = false;
 
             #region Jester
-            EnableJesterCounterplay = config.BindSyncedEntry("Server-side", "EnableJesterCounterplay", true, "Add counterplay for Jester.");
-            WeightToPreventJester = config.BindSyncedEntry("Server-side", "WeightToPreventJester", 30f, "Weight of items needed to prevent Jester pop out.");
+            EnableJesterCounterplay = config.BindSyncedEntry("Jester", "EnableJesterCounterplay", true, "Add counterplay for Jester.");
+            WeightToPreventJester = config.BindSyncedEntry("Jester", "WeightToPreventJester", 30f, "Weight of items needed to prevent Jester pop out.");
             #endregion
 
             #region Turret
-            EnableTurretCounterplay = config.BindSyncedEntry("Server-side", "EnableTurretCounterplay", true, "Add counterplay for Turret.");
+            EnableTurretCounterplay = config.BindSyncedEntry("Turret", "EnableTurretCounterplay", true, "Add counterplay for Turret.");
             #endregion
 
             #region Coilhead
-            EnableCoilheadCounterplay = config.BindSyncedEntry("Server-side", "EnableCoilheadCounterplay", true, "Add counterplay for Coilheads (requires restart). Required by settings below.");
-            SpringDurability = config.BindSyncedEntry("Server-side", "SpringDurability", 3, "Set Coilhead health points (requires restart).");
-            CoilheadDefaultDamage = config.BindSyncedEntry("Server-side", "CoilheadDefaultDamage", 0, "Amount of damage that Coilheads take from any source not specified below.");
-            CoilheadKnifeDamage = config.BindSyncedEntry("Server-side", "CoilheadKnifeDamage", 1, "Amount of damage that Coilheads take from Knife.");
-            CoilheadShovelDamage = config.BindSyncedEntry("Server-side", "CoilheadShovelDamage", 0, "Amount of damage that Coilheads take from Shovel.");
-            DropHeadAsScrap = config.BindSyncedEntry("Server-side", "DropHeadAsScrap", true, "Enable the Coilhead head scrap item spawning on death (requires restart).");
-            MinHeadValue = config.BindSyncedEntry("Server-side", "MinHeadValue", 30, "Minimum value of the Coilhead head item.");
-            MaxHeadValue = config.BindSyncedEntry("Server-side", "MaxHeadValue", 70, "Maximum value of the Coilhead head item.");
+            EnableCoilheadCounterplay = config.BindSyncedEntry("Coilhead", "EnableCoilheadCounterplay", true, "Add counterplay for Coilheads. Required for all Coilhead settings under this.");
+            SpringDurability = config.BindSyncedEntry("Coilhead", "SpringDurability", 3, "Set Coilhead health points.");
+            CoilheadDefaultDamage = config.BindSyncedEntry("Coilhead", "CoilheadDefaultDamage", 0, "Amount of damage that Coilheads take from any source not specified below.");
+            CoilheadKnifeDamage = config.BindSyncedEntry("Coilhead", "CoilheadKnifeDamage", 1, "Amount of damage that Coilheads take from Knife.");
+            CoilheadShovelDamage = config.BindSyncedEntry("Coilhead", "CoilheadShovelDamage", 0, "Amount of damage that Coilheads take from Shovel.");
+            DropHeadAsScrap = config.BindSyncedEntry("Coilhead", "DropHeadAsScrap", true, "Enable the Coilhead head scrap item spawning on death.");
+            MinHeadValue = config.BindSyncedEntry("Coilhead", "MinHeadValue", 30, "Minimum value of the Coilhead head item.");
+            MaxHeadValue = config.BindSyncedEntry("Coilhead", "MaxHeadValue", 70, "Maximum value of the Coilhead head item.");
 
-            LoreAccurateCoilheads = config.BindSyncedEntry("Server-side", "LoreAccurateCoilheads", true, "Enable lore accurate (volatile) Coilhead counterplay (requires restart). Required by settings below.");
-            ExplosionDamage = config.BindSyncedEntry("Server-side", "ExplosionDamage", 50, "Amount of damage the Coilhead explosion deals.");
-            ExplosionDamageRadius = config.BindSyncedEntry("Server-side", "ExplosionDamageRadius", 4f, "Radius of the Coilhead explosion damage zone.");
-            ExplosionKillRadius = config.BindSyncedEntry("Server-side", "ExplosionKillRadius", 2f, "Radius of the Coilhead explosion kill zone.");
-            MinExplosionTimer = config.BindSyncedEntry("Server-side", "MinExplosionTimer", 0.5f, "Minimum time until Coilhead explosion.");
-            MaxExplosionTimer = config.BindSyncedEntry("Server-side", "MaxExplosionTimer", 5f, "Maximum time until Coilhead explosion.");
-            ExplosionDestroysHead = config.BindSyncedEntry("Server-side", "ExplosionDestroysHead", true, "Destroy Coilhead scrap head if still attached during explosion.");
+            LoreAccurateCoilheads = config.BindSyncedEntry("Coilhead", "LoreAccurateCoilheads", true, "Enable lore accurate (volatile) Coilhead counterplay (requires restart). Required for all Coilhead settings under this.");
+            ExplosionDamage = config.BindSyncedEntry("Coilhead", "ExplosionDamage", 50, "Amount of damage the Coilhead explosion deals.");
+            ExplosionDamageRadius = config.BindSyncedEntry("Coilhead", "ExplosionDamageRadius", 4f, "Radius of the Coilhead explosion damage zone.");
+            ExplosionKillRadius = config.BindSyncedEntry("Coilhead", "ExplosionKillRadius", 2f, "Radius of the Coilhead explosion kill zone.");
+            MinExplosionTimer = config.BindSyncedEntry("Coilhead", "MinExplosionTimer", 0.5f, "Minimum time until Coilhead explosion.");
+            MaxExplosionTimer = config.BindSyncedEntry("Coilhead", "MaxExplosionTimer", 5f, "Maximum time until Coilhead explosion.");
+            ExplosionDestroysHead = config.BindSyncedEntry("Coilhead", "ExplosionDestroysHead", true, "Destroy Coilhead scrap head if still attached during explosion.");
+
+            ExplosionFire = config.Bind("Coilhead", "ExplosionFire", true, "(Client-side) Enable green fire effect for Coilheads that are about to explode.");
+            ExplosionParticles = config.Bind("Coilhead", "ExplosionParticles", true, "(Client-side) Enable radioactive particles effect for Coilheads that are about to explode.");
+            ExplosionWarnVolume = config.Bind("Coilhead", "ExplosionWarnVolume", 1.0f, new ConfigDescription("(Client-side) Adjust volume of the sound effect played right before exploding (NOT the actual explosion).",
+                new AcceptableValueRange<float>(0.0f, 1.0f)));
+            EnableCoilheadScanNode = config.Bind("Coilhead", "EnableCoilheadScanNode", true, "(Client-side) Enable scanning Coilheads that have been killed.");
+            ModifyCoilheadScanNode = config.Bind("Coilhead", "ModifyCoilheadScanNode", true, "(Client-side) Add extra text/subtext to a killed Coilhead's scan node.");
             #endregion
 
             // Function to run after configuration is synced (upon joining lobby).

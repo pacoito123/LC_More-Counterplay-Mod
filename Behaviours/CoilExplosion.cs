@@ -127,7 +127,8 @@ namespace MoreCounterplay.Behaviours
 		private void PlaySfxClientRpc()
 		{
 			// Play unused 'Spring1.ogg' sound effect, or 'EnterCooldown.ogg' sound effect if the former is not found.
-			Coilhead?.creatureVoice.PlayOneShot(HeadItem.Prefab?.GetComponent<HeadItem>().itemProperties.throwSFX ?? Coilhead?.enterCooldownSFX);
+			Coilhead?.creatureVoice.PlayOneShot(HeadItem.Prefab?.GetComponent<HeadItem>().itemProperties.throwSFX ?? Coilhead?.enterCooldownSFX,
+				MoreCounterplay.Settings.ExplosionWarnVolume.Value);
 		}
 
 		/// <summary>
@@ -137,13 +138,19 @@ namespace MoreCounterplay.Behaviours
 		[ClientRpc]
 		internal void UpdateScanNodeClientRpc(bool ignited)
 		{
+			// Return if not re-enabling the Coilhead scan node.
+			if (!MoreCounterplay.Settings.ModifyCoilheadScanNode.Value) return;
+
 			// Obtain and re-enable scan node.
 			ScanNodeProperties scanNode = transform.Find("SpringManModel/ScanNode").GetComponent<ScanNodeProperties>();
 			scanNode.GetComponent<Collider>().enabled = true;
 
+			// Return if not making any further changes to the Coilhead scan node.
+			if (!MoreCounterplay.Settings.ModifyCoilheadScanNode.Value) return;
+
 			// Update scan node to match current state.
 			scanNode.headerText = $"{(ignited ? "Fissile" : "Decayed")} Coil-Head";
-			scanNode.subText = ignited ? "Run." : "I wouldn't get close...";
+			scanNode.subText = ignited ? "Run." : "Don't get too close...";
 			scanNode.nodeType = ignited ? 1 : 0;
 		}
 	}
