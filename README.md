@@ -72,6 +72,12 @@ You can cut off a Coilhead's head using a knife. Its head will become a scrap it
   - Minimum and maximum time until exploding can be configured via the `MinExplosionTimer` and `MaxExplosionTimer` settings, respectively
 - Coilhead's head item is destroyed if its body explodes while it's still attached to its neck
   - Can be disabled by toggling the `ExplosionDestroysHead` setting, but it adds some interesting risk/reward by making players stay close to try and pick up the head before it explodes
+- Client-side configuration settings:
+  - `ExplosionFire` - Enable green fire effect for Coilheads that are about to explode
+  - `ExplosionParticles` - Enable radioactive particles effect for Coilheads that are about to explode
+  - `ExplosionWarnVolume` - Adjust volume of the sound effect played right before exploding (**NOT** the actual explosion)
+  - `EnableCoilheadScanNode` - Enable scanning Coilheads that have been killed
+  - `ModifyCoilheadScanNode` - Add extra text/subtext to a killed Coilhead's scan node (requires `EnableCoilheadScanNode`)
 
  </div>
  </details>

@@ -127,7 +127,7 @@ namespace MoreCounterplay.Patches
             if (!MoreCounterplay.Settings.LoreAccurateCoilheads) return;
 
             // Enable radioactive fire particle effects.
-            coilhead.gameObject.transform.Find("SpringManModel/RadioactiveFire")?.gameObject.SetActive(true);
+            coilhead.transform.Find("SpringManModel/RadioactiveFire")?.gameObject.SetActive(true);
 
             // Activate behaviour script only when called from the server.
             if (!coilhead.IsServer && !coilhead.IsHost) return;

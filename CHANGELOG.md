@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.3.1
+
+- Added several client-sided configuration settings for "lore accurate" Coilheads
+- Fixed "lore accurate" Coilhead particle effects not showing up after reloading a lobby once
+- Split configuration file entries into categories based on their respective entities
+
 ## 1.3.0
 
 <ul>

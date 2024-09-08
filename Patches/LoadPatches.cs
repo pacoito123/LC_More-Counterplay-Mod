@@ -4,6 +4,8 @@ using MoreCounterplay.Items;
 using MoreCounterplay.Util;
 using UnityEngine;
 
+using static MoreCounterplay.MoreCounterplay;
+
 namespace MoreCounterplay.Patches
 {
     /// <summary>
@@ -17,7 +19,7 @@ namespace MoreCounterplay.Patches
         private static void OnDisconnect()
         {
             // Remove added components from the Coilhead prefab.
-            CoilExplosion.RadioactiveFirePrefab?.transform.SetParent(null);
+            CoilExplosion.RadioactiveFirePrefab?.transform.SetParent(null, false);
             Object.Destroy(CoilExplosion.CoilheadPrefab?.GetComponent<CoilExplosion>());
 
             // Reset Coilhead prefab to vanilla values.
@@ -34,9 +36,9 @@ namespace MoreCounterplay.Patches
         internal static void FindAndModifyPrefabs()
         {
             // Currently, only the Coilhead counterplay requires textures loaded at runtime.
-            if (!MoreCounterplay.Settings.EnableCoilheadCounterplay) return;
+            if (!Settings.EnableCoilheadCounterplay) return;
 
-            MoreCounterplay.Log("Loading prefab textures...");
+            Log("Loading prefab textures...");
 
             // Try to find and obtain the Coilhead's enemy prefab.
             if (VanillaPrefabUtils.GetInsideEnemyPrefab("Spring", out GameObject? coilheadPrefab))
@@ -48,20 +50,28 @@ namespace MoreCounterplay.Patches
                 {
                     // Modify Coilhead health to the configured amount and allow it to die.
                     SpringManAI coilhead = coilheadPrefab.GetComponent<SpringManAI>();
-                    coilhead.enemyHP = MoreCounterplay.Settings.SpringDurability;
+                    coilhead.enemyHP = Settings.SpringDurability;
                     coilhead.enemyType.canDie = true;
 
-                    if (MoreCounterplay.Settings.LoreAccurateCoilheads)
+                    if (Settings.LoreAccurateCoilheads)
                     {
                         // Add explosion network behaviour script to the Coilhead prefab.
                         coilheadPrefab.AddComponent<CoilExplosion>().enabled = false;
 
-                        // Add radioactive fire particle effects container to the Coilhead prefab.
-                        CoilExplosion.RadioactiveFirePrefab?.transform.SetParent(coilheadPrefab.transform.Find("SpringManModel"), false);
-                        CoilExplosion.RadioactiveFirePrefab?.SetActive(false);
+                        if (CoilExplosion.RadioactiveFirePrefab != null && (Settings.ExplosionFire.Value || Settings.ExplosionParticles.Value))
+                        {
+                            // Add radioactive fire particle effects container to the Coilhead prefab.
+                            CoilExplosion.RadioactiveFirePrefab.transform.SetParent(coilheadPrefab.transform.Find("SpringManModel"), false);
+                            CoilExplosion.RadioactiveFirePrefab.SetActive(false);
+
+                            // Enable/disable individual components of the radioactive fire particle effects prefab.
+                            CoilExplosion.RadioactiveFirePrefab.transform.Find("FireLight").GetComponent<Light>().enabled = Settings.ExplosionFire.Value;
+                            CoilExplosion.RadioactiveFirePrefab.transform.Find("GreenFlame").GetComponent<ParticleSystemRenderer>().enabled = Settings.ExplosionFire.Value;
+                            CoilExplosion.RadioactiveFirePrefab.transform.Find("RadioactiveParticles").GetComponent<ParticleSystemRenderer>().enabled = Settings.ExplosionParticles.Value;
+                        }
                     }
 
-                    if (MoreCounterplay.Settings.DropHeadAsScrap)
+                    if (Settings.DropHeadAsScrap)
                     {
                         // Obtain Coilhead material from its enemy prefab and assign it to the 'Coilless Coilhead' scrap item prefab.
                         Material coilheadMaterial = coilheadPrefab.transform.Find("SpringManModel/Head").GetComponent<MeshRenderer>().material;
@@ -70,13 +80,13 @@ namespace MoreCounterplay.Patches
                 }
                 else
                 {
-                    MoreCounterplay.LogWarning("Either the 'Coilless Coilhead' prefab did not load or the Coilhead enemy prefab could not be found. "
+                    LogWarning("Either the 'Coilless Coilhead' prefab did not load or the Coilhead enemy prefab could not be found. "
                         + "Either way, some stuff might not load or work properly.");
                 }
             }
 
             // Try to find and obtain the Forest Giant enemy prefab.
-            if (MoreCounterplay.Settings.LoreAccurateCoilheads && VanillaPrefabUtils.GetOutsideEnemyPrefab("ForestGiant", out GameObject? giantPrefab))
+            if (Settings.LoreAccurateCoilheads && Settings.ExplosionFire.Value && VanillaPrefabUtils.GetOutsideEnemyPrefab("ForestGiant", out GameObject? giantPrefab))
             {
                 if (CoilExplosion.RadioactiveFirePrefab != null && giantPrefab != null)
                 {
@@ -86,12 +96,12 @@ namespace MoreCounterplay.Patches
                 }
                 else
                 {
-                    MoreCounterplay.LogWarning("Either the 'RadioactiveFire' prefab did not load or the Forest Giant enemy prefab could not be found. "
+                    LogWarning("Either the 'RadioactiveFire' prefab did not load or the Forest Giant enemy prefab could not be found. "
                         + "Either way, some stuff might not load or work properly.");
                 }
             }
 
-            MoreCounterplay.Log("Finished loading textures!");
+            Log("Finished loading textures!");
         }
     }
 }
