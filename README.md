@@ -9,17 +9,58 @@ Mod is fully configurable so you can disable or edit counterplays that you don't
 ### Jester
 
 <details>
- <summary>Spoiler</summary>
- You can prevent Jester from opening by putting heavy items on top of it.
+<summary>Spoiler</summary>
 
- ![A Jester carrying a big bolt on its head.](https://i.imgur.com/QcykrPl.jpg)
+Items may be placed on top of a Jester by holding an item and interacting with its lid, it'll carry them around until the next time it pops. If the total weight of items on its head exceeds a certain (configurable) amount, the Jester will be too exhausted to chase you after popping and its head will return to its box immediately.
+
+<div style="text-align: center;">
+ <img alt="A lamp being placed on top of a Jester." src="https://files.catbox.moe/1snzdi.gif" width=256>
+ <img alt="A Jester with several items on its head popping and returning to its box immediately." src="https://files.catbox.moe/dpvi2u.gif" width=256>
+ <h2 style="font-weight: bold; color: firebrick; text-shadow: 0 0 3px black">— [Warning] —</h2>
+
+ > Expecting a Jester to comply with carrying an excessive amount of weight may lead to disastrous consequences, as a desperate Jester's pop is much stronger than normal.
+
+ **Hint:** _A Jester <u>will</u> let you know when you've exceeded its limits, but there's still a short window to correct your mistake..._
+
+ <img alt="A Jester with an anvil on its head chasing and killing the player after popping." src="https://files.catbox.moe/qpse3i.gif" width=256>
+
+ <details>
+ <summary>Spoiler (specific mechanics and configuration):</summary>
+
+ <div style="text-align: left;">
+
+- Any grabbable item can be deposited onto a Jester by holding the interact button while the prompt to place an item is visible (similar to the Ship's storage cabinet, the Cruiser's back storage, and the desk at the Company).
+  - Every placed item's weight is added to the Jester's total weight, which forms the basis for its counterplay.
+- If the Jester finishes cranking while its total weight exceeds the amount set by the `JesterPreventThreshold` setting (**60** pounds by default), its head visually pops out for a brief moment to drop its items before returning to its box, without actually chasing or killing players.
+  - Toggling the `ItemsStayOnLid` setting disables the Jester's ability to drop its items and keeps its head inside the box at all times, making it like how it used to work in previous versions of the mod.
+- If the Jester's total weight exceeds the amount set by the `JesterEncumberThreshold` setting (**120** pounds by default), it'll no longer be able to follow you around due to being encumbered by the items.
+  - Threshold setting can be set to `0` to disable the Jester's encumbered state completely, or a small value (e.g. `0.1`) to allow almost any item to stop the Jester from moving.
+- If the Jester's total weight exceeds the amount set by the `JesterPanicThreshold` setting (**200** pounds by default), it'll panic and begin cranking frantically before popping shortly after.
+  - Threshold setting can be set to `0` to disable the Jester's panicked state completely.
+  - Minimum and maximum time that the Jester spends panicking can be configured via the `MinPanicTimer` and `MaxPanicTimer` settings, respectively.
+  - Setting this threshold to a lower value than the `JesterPreventThreshold` setting functionally disables it as a counterplay, since the Jester's pop is not prevented while panicking.
+  - Placing an item while over the panic threshold and while the Jester is cranking (even normally) will cause it to **skip its cranking and pop immediately**.
+- Whenever a Jester is hit by a shovel, it'll drop all its held items and reset its weight.
+  - Can be disabled by toggling the `DropItemsOnHit` setting.
+- The total amount of weight the Jester is carrying is shown in the subtext of its scan node.
+  - Can be disabled by toggling the `ShowWeightOnScan` setting.
+  - Might be slightly inaccurate due to integer rounding, or if an item is destroyed or otherwise removed by other means.
+
+ </div>
+ </details>
+</div>
 </details>
 
 <details>
  <summary>Configs</summary>
 
-- `EnableJesterCounterplay` - Add counterplay for Jester.
-- `WeightToPreventJester` - Weight of items needed to prevent Jester pop out.
+- `EnableJesterCounterplay` - Add counterplay for Jesters.
+- `JesterPreventThreshold` - Minimum weight of items needed to prevent the Jester from popping.
+- `JesterEncumberThreshold` - Minimum weight of items needed to prevent the Jester from walking at all.
+- `JesterPanicThreshold` - See above for more info.
+- `ItemsStayOnLid` - Allow items to stay on top of the Jester after preventing it from popping.
+- `DropItemsOnHit` - Drop all items on top of the Jester when hitting it with a shovel.
+- `ShowWeightOnScan` - Shows the total weight on top of the Jester as the subtext of its scan node.
 
 </details>
 

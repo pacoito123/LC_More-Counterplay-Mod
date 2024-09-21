@@ -13,7 +13,17 @@ namespace MoreCounterplay.Config
         #region Variables
         #region Jester
         [field: SyncedEntryField] public SyncedEntry<bool> EnableJesterCounterplay { get; private set; }
-        [field: SyncedEntryField] public SyncedEntry<float> WeightToPreventJester { get; private set; }
+        [field: SyncedEntryField] public SyncedEntry<float> JesterPreventThreshold { get; private set; }
+        [field: SyncedEntryField] public SyncedEntry<float> JesterEncumberThreshold { get; private set; }
+        [field: SyncedEntryField] public SyncedEntry<float> JesterPanicThreshold { get; private set; }
+
+        [field: SyncedEntryField] public SyncedEntry<float> MinPanicTimer { get; private set; }
+        [field: SyncedEntryField] public SyncedEntry<float> MaxPanicTimer { get; private set; }
+
+        [field: SyncedEntryField] public SyncedEntry<bool> ItemsStayOnLid { get; private set; }
+        [field: SyncedEntryField] public SyncedEntry<bool> DropItemsOnHit { get; private set; }
+
+        [field: SyncedEntryField] public SyncedEntry<bool> ShowWeightOnScan { get; private set; }
         #endregion
 
         #region Turret
@@ -52,8 +62,18 @@ namespace MoreCounterplay.Config
             config.SaveOnConfigSet = false;
 
             #region Jester
-            EnableJesterCounterplay = config.BindSyncedEntry("Jester", "EnableJesterCounterplay", true, "Add counterplay for Jester.");
-            WeightToPreventJester = config.BindSyncedEntry("Jester", "WeightToPreventJester", 30f, "Weight of items needed to prevent Jester pop out.");
+            EnableJesterCounterplay = config.BindSyncedEntry("Jester", "EnableJesterCounterplay", true, "Add counterplay for Jesters. Required for all Jester settings under this.");
+            JesterPreventThreshold = config.BindSyncedEntry("Jester", "JesterPreventThreshold", 60f, "Minimum weight of items needed to prevent the Jester from popping. Set to 0 to disable.");
+            JesterEncumberThreshold = config.BindSyncedEntry("Jester", "JesterEncumberThreshold", 120f, "Minimum weight of items needed to prevent the Jester from walking at all. Set to 0 to disable. Can be smaller than the setting above.");
+            JesterPanicThreshold = config.BindSyncedEntry("Jester", "JesterPanicThreshold", 200f, "Minimum weight of items needed for the Jester to start panicking. Set to 0 to disable. Functionally disables counterplay if lower than the 'prevent' threshold.");
+
+            MinPanicTimer = config.BindSyncedEntry("Jester", "MinPanicTimer", 0.5f, "Shortest amount of time the Jester can panic for before popping.");
+            MaxPanicTimer = config.BindSyncedEntry("Jester", "MaxPanicTimer", 5f, "Largest amount of time the Jester can panic for before popping");
+
+            ItemsStayOnLid = config.BindSyncedEntry("Jester", "ItemsStayOnLid", false, "Allow items to stay on top of the Jester after preventing it from popping.");
+            DropItemsOnHit = config.BindSyncedEntry("Jester", "DropItemsOnHit", true, "Drop all items on top of the Jester when hitting it with a shovel.");
+
+            ShowWeightOnScan = config.BindSyncedEntry("Jester", "ShowWeightOnScan", true, "Shows the total weight on top of the Jester as the subtext of its scan node.");
             #endregion
 
             #region Turret
