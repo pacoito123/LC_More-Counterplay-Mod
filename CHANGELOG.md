@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.4.0
+
+- "Coilless Coilhead" material texture is now obtained from the Coilhead right as it spawns
+  - Should make it compatible with some [EnemySkinKit](https://thunderstore.io/c/lethal-company/p/AntlerShed/EnemySkinKit) skins that don't modify the Coilhead model too much (e.g. [ColorfulEnemyVariety](https://thunderstore.io/c/lethal-company/p/DistinctBlaze/ColorfulEnemyVariety))
+  - Material texture persists until reloading the save file, at which point it'll return to the vanilla Coilhead texture
+- Fixed "Coilless Coilhead" item sound effects being heard globally by changing it from a 2D sound to a 3D one
+
 ## 1.3.1
 
 - Added several client-sided configuration settings for "lore accurate" Coilheads

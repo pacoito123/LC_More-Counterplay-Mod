@@ -64,6 +64,10 @@ namespace MoreCounterplay.Items
 				// Obtain Coilhead's head prefab.
 				GameObject originalHead = coilheadNetworkObject.transform.Find("SpringManModel/Head").gameObject;
 
+				// Obtain head material and assign it to the 'Coilless Coilhead' scrap item prefab.
+				Material headMaterial = originalHead.GetComponent<MeshRenderer>().material;
+				GetComponent<MeshRenderer>().material = headMaterial;
+
 				// Attach head scrap item to original head object.
 				AttachTo(originalHead);
 

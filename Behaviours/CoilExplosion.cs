@@ -7,7 +7,7 @@ namespace MoreCounterplay.Behaviours
 	/// <summary>
 	/// 	Network behaviour script handling a dissected Coilhead's volatility.
 	/// </summary>
-	internal class CoilExplosion : NetworkBehaviour
+	public class CoilExplosion : NetworkBehaviour
 	{
 		/// <summary>
 		/// 	Vanilla prefab for the Coilhead.
@@ -59,15 +59,18 @@ namespace MoreCounterplay.Behaviours
 			base.OnNetworkSpawn();
 
 			// Assign object containers.
-			Coilhead = GetComponent<SpringManAI>();
-			FireContainer = transform.Find("SpringManModel/RadioactiveFire").gameObject;
+			if (TryGetComponent(out SpringManAI coilhead))
+			{
+				Coilhead = coilhead;
+			}
+			FireContainer = transform.Find("SpringManModel/RadioactiveFire")?.gameObject;
 		}
 
 		public void LateUpdate()
 		{
 			if (!Ticking)
 			{
-				// Update time since last stop if explosion timer is not ticking.
+				// Update time since last stop if the explosion timer is not ticking.
 				TimeSinceLastStop += Time.deltaTime;
 				return;
 			}
@@ -76,8 +79,8 @@ namespace MoreCounterplay.Behaviours
 			if (TimeLeft <= 0.0f)
 			{
 				// Attempt to destroy 'Coilless Coilhead' scrap item if still attached.
-				AttachedItem? attachedItem = HeadContainer?.GetComponent<AttachedItem>();
-				if (attachedItem != null && attachedItem.IsAttached && !attachedItem.heldByPlayerOnServer && MoreCounterplay.Settings.ExplosionDestroysHead)
+				if (HeadContainer?.TryGetComponent(out AttachedItem attachedItem) == true
+					&& attachedItem.IsAttached && !attachedItem.heldByPlayerOnServer && MoreCounterplay.Settings.ExplosionDestroysHead)
 				{
 					HeadContainer?.GetComponent<NetworkObject>().Despawn();
 				}
@@ -85,7 +88,7 @@ namespace MoreCounterplay.Behaviours
 				// Spawn explosion on clients.
 				SpawnExplosionClientRpc();
 
-				// Update scan node text on clients.
+				// Update scan node text on all clients.
 				UpdateScanNodeClientRpc(false);
 
 				// Disable script after exploding.
@@ -126,9 +129,9 @@ namespace MoreCounterplay.Behaviours
 		[ClientRpc]
 		private void PlaySfxClientRpc()
 		{
-			// Play unused 'Spring1.ogg' sound effect, or 'EnterCooldown.ogg' sound effect if the former is not found.
-			Coilhead?.creatureVoice.PlayOneShot(HeadItem.Prefab?.GetComponent<HeadItem>().itemProperties.throwSFX ?? Coilhead?.enterCooldownSFX,
-				MoreCounterplay.Settings.ExplosionWarnVolume.Value);
+			// Play 'Spring1.ogg' sound effect, or 'EnterCooldown.ogg' sound effect if the former is not found.
+			Coilhead?.creatureVoice.PlayOneShot(HeadItem.Prefab?.TryGetComponent(out HeadItem headItem) == true
+				? headItem.itemProperties.throwSFX : Coilhead?.enterCooldownSFX, MoreCounterplay.Settings.ExplosionWarnVolume.Value);
 		}
 
 		/// <summary>
@@ -141,9 +144,14 @@ namespace MoreCounterplay.Behaviours
 			// Return if not re-enabling the Coilhead scan node.
 			if (!MoreCounterplay.Settings.ModifyCoilheadScanNode.Value) return;
 
-			// Obtain and re-enable scan node.
-			ScanNodeProperties scanNode = transform.Find("SpringManModel/ScanNode").GetComponent<ScanNodeProperties>();
-			scanNode.GetComponent<Collider>().enabled = true;
+			// Find and obtain Coilhead scan node.
+			if (transform.Find("SpringManModel/ScanNode")?.TryGetComponent(out ScanNodeProperties scanNode) != true) return;
+
+			// Find, obtain, and re-enable scan node Collider.
+			if (scanNode.TryGetComponent(out Collider collider))
+			{
+				collider.enabled = true;
+			}
 
 			// Return if not making any further changes to the Coilhead scan node.
 			if (!MoreCounterplay.Settings.ModifyCoilheadScanNode.Value) return;

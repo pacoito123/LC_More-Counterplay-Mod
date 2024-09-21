@@ -48,16 +48,18 @@ Mod is fully configurable so you can disable or edit counterplays that you don't
 <details>
 <summary>Spoiler</summary>
 
-You can cut off a Coilhead's head using a knife. Its head will become a scrap item and can be grabbed and sold, though you must detach it.
+You can cut off a Coilhead's head using the [Knife](https://lethal.miraheze.org/wiki/Kitchen_knife) dropped by the [Butler](https://lethal.miraheze.org/wiki/Butler), which deactivates it permanently. Its head will drop as a scrap item that can be sold to the Company, but it must first be detached from its neck.
 
 <div style="text-align: center;">
- <img alt="A decapitated Coilhead." src="https://i.imgur.com/WtcAkJ9.jpg" width=256>
- <img alt="A 'Coilless Coilhead' on the ground." src="https://i.imgur.com/LvhsWHD.jpg" width=256>
+ <img alt="A player chopping off a Coilhead's head and picking it up." src="https://files.catbox.moe/wvogrm.gif" width=256>
+ <img alt="A player trapped in a room by a deactivated Coilhead blocking the door, about to be killed by a Jester." src="https://files.catbox.moe/p1tbqj.gif" width=256>
  <h2 style="font-weight: bold; color: firebrick; text-shadow: 0 0 3px black">— [Warning] —</h2>
 
  > _"They have been known to combust into flames when being dissected or even deactivated, and they carry dangerously high levels of radioactive particles."_ - Sigurd's notes
 
  **Hint:** _You may find a Coilhead to be less volatile the more kinetic energy it releases when coming to a halt..._
+
+ <img alt="A player chopping off a Coilhead's head, picking it up, and then dying due to being too close to the explosion." src="https://files.catbox.moe/bvxtxg.gif" width=256>
 
  <details>
  <summary>Spoiler (specific mechanics and configuration):</summary>
@@ -65,19 +67,19 @@ You can cut off a Coilhead's head using a knife. Its head will become a scrap it
  <div style="text-align: left;">
 
 - Coilhead bodies combust upon being decapitated, as their Bestiary entry suggests
-  - Can be disabled by toggling the `LoreAccurateCoilheads` setting
-  - The range of the explosion damage is determined by the `ExplosionDamageRadius` setting, with the damage itself being set to the value of the `ExplosionDamage` setting
-  - Likewise, the `ExplosionKillRadius` setting determines the range around the explosion where it simply kills the player instead of dealing damage to them
-- Explosion timer is set to how long the Coilhead has moved since it last stopped, within configurable limits
+  - Can be disabled by toggling the `LoreAccurateCoilheads` setting.
+  - The range of the explosion damage is determined by the `ExplosionDamageRadius` setting, with the damage itself being set to the value of the `ExplosionDamage` setting.
+  - Likewise, the `ExplosionKillRadius` setting determines the range around the explosion where it simply kills the player instead of dealing damage to them.
+- Explosion timer is set to how long the Coilhead has moved since it last stopped, within configurable limits.
   - Minimum and maximum time until exploding can be configured via the `MinExplosionTimer` and `MaxExplosionTimer` settings, respectively
-- Coilhead's head item is destroyed if its body explodes while it's still attached to its neck
-  - Can be disabled by toggling the `ExplosionDestroysHead` setting, but it adds some interesting risk/reward by making players stay close to try and pick up the head before it explodes
+- Coilhead's head item is destroyed if its body explodes while it's still attached to its neck.
+  - Can be disabled by toggling the `ExplosionDestroysHead` setting, but it adds some interesting risk/reward by making players stay close to try and pick up the head before it explodes.
 - Client-side configuration settings:
-  - `ExplosionFire` - Enable green fire effect for Coilheads that are about to explode
-  - `ExplosionParticles` - Enable radioactive particles effect for Coilheads that are about to explode
-  - `ExplosionWarnVolume` - Adjust volume of the sound effect played right before exploding (**NOT** the actual explosion)
-  - `EnableCoilheadScanNode` - Enable scanning Coilheads that have been killed
-  - `ModifyCoilheadScanNode` - Add extra text/subtext to a killed Coilhead's scan node (requires `EnableCoilheadScanNode`)
+  - `ExplosionFire` - Enable green fire effect for Coilheads that are about to explode.
+  - `ExplosionParticles` - Enable radioactive particles effect for Coilheads that are about to explode.
+  - `ExplosionWarnVolume` - Adjust volume of the sound effect played right before exploding (**NOT** the actual explosion).
+  - `EnableCoilheadScanNode` - Enable scanning Coilheads that have been killed.
+  - `ModifyCoilheadScanNode` - Add extra text/subtext to a killed Coilhead's scan node (requires `EnableCoilheadScanNode`).
 
  </div>
  </details>
