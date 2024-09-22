@@ -14,15 +14,15 @@ Mod is fully configurable so you can disable or edit counterplays that you don't
 Items may be placed on top of a Jester by holding an item and interacting with its lid, it'll carry them around until the next time it pops. If the total weight of items on its head exceeds a certain (configurable) amount, the Jester will be too exhausted to chase you after popping and its head will return to its box immediately.
 
 <div style="text-align: center;">
- <img alt="A lamp being placed on top of a Jester." src="https://files.catbox.moe/1snzdi.gif" width=256>
- <img alt="A Jester with several items on its head popping and returning to its box immediately." src="https://files.catbox.moe/dpvi2u.gif" width=256>
+ <img alt="A lamp being placed on top of a Jester." src="https://files.catbox.moe/jkqrv8.gif" width=256>
+ <img alt="A Jester with several items on its head popping and returning to its box immediately." src="https://files.catbox.moe/49ut0j.gif" width=256>
  <h2 style="font-weight: bold; color: firebrick; text-shadow: 0 0 3px black">— [Warning] —</h2>
 
  > Expecting a Jester to comply with carrying an excessive amount of weight may lead to disastrous consequences, as a desperate Jester's pop is much stronger than normal.
 
  **Hint:** _A Jester <u>will</u> let you know when you've exceeded its limits, but there's still a short window to correct your mistake..._
 
- <img alt="A Jester with an anvil on its head chasing and killing the player after popping." src="https://files.catbox.moe/qpse3i.gif" width=256>
+ <img alt="A Jester with an anvil on its head chasing and killing the player after popping." src="https://files.catbox.moe/2cebnk.gif" width=256>
 
  <details>
  <summary>Spoiler (specific mechanics and configuration):</summary>
@@ -92,15 +92,15 @@ Items may be placed on top of a Jester by holding an item and interacting with i
 You can cut off a Coilhead's head using the [Knife](https://lethal.miraheze.org/wiki/Kitchen_knife) dropped by the [Butler](https://lethal.miraheze.org/wiki/Butler), which deactivates it permanently. Its head will drop as a scrap item that can be sold to the Company, but it must first be detached from its neck.
 
 <div style="text-align: center;">
- <img alt="A player chopping off a Coilhead's head and picking it up." src="https://files.catbox.moe/wvogrm.gif" width=256>
- <img alt="A player trapped in a room by a deactivated Coilhead blocking the door, about to be killed by a Jester." src="https://files.catbox.moe/p1tbqj.gif" width=256>
+ <img alt="A player chopping off a Coilhead's head and picking it up." src="https://files.catbox.moe/2k34ho.gif" width=256>
+ <img alt="A player trapped in a room by a deactivated Coilhead blocking the door, about to be killed by a Jester." src="https://files.catbox.moe/uqq80x.gif" width=256>
  <h2 style="font-weight: bold; color: firebrick; text-shadow: 0 0 3px black">— [Warning] —</h2>
 
  > _"They have been known to combust into flames when being dissected or even deactivated, and they carry dangerously high levels of radioactive particles."_ - Sigurd's notes
 
  **Hint:** _You may find a Coilhead to be less volatile the more kinetic energy it releases when coming to a halt..._
 
- <img alt="A player chopping off a Coilhead's head, picking it up, and then dying due to being too close to the explosion." src="https://files.catbox.moe/bvxtxg.gif" width=256>
+ <img alt="A player chopping off a Coilhead's head, picking it up, and then dying due to being too close to the explosion." src="https://files.catbox.moe/7ij65e.gif" width=256>
 
  <details>
  <summary>Spoiler (specific mechanics and configuration):</summary>
