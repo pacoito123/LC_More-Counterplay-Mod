@@ -282,20 +282,21 @@ namespace MoreCounterplay.Behaviours
 		}
 
 		/// <summary>
-		/// 	Handles TODO.
+		/// 	Handles switching a Jester's animation both when its pop is prevented and when it finishes panicking.
 		/// </summary>
-		/// <param name="panic"></param>
+		/// <param name="panic">Whether or not the Jester is in its panicked state.</param>
 		[ClientRpc]
-		public void PreventJesterPopClientRpc(bool panic = false)
+		public void SwitchAnimationClientRpc(bool panic = false)
 		{
 			if (Jester == null) return;
 
 			if (panic || !MoreCounterplay.Settings.ItemsStayOnLid)
 			{
-				// Show Jester's head for a brief moment before dropping items (cannot kill players).
+				// Show Jester's head for a brief moment before dropping items (cannot actually kill players unless it's panicking).
 				Jester.creatureAnimator.CrossFade("JesterPopUp", 0.1f);
 				Jester.creatureVoice.Stop();
 
+				// Drop all items on top of the Jester.
 				DropAllItemsOnClient();
 			}
 			else
@@ -323,7 +324,7 @@ namespace MoreCounterplay.Behaviours
 		}
 
 		/// <summary>
-		/// 	TODO.
+		/// 	Send 'JesterSurface.PlaceItemClientRpc()' call from the server to all clients.
 		/// </summary>
 		/// <param name="playerReference">NetworkObject reference of the player who placed the item.</param>
 		/// <param name="itemReference">NetworkObject reference of the item to place.</param>
@@ -352,7 +353,7 @@ namespace MoreCounterplay.Behaviours
 		}
 
 		/// <summary>
-		/// 	TODO.
+		/// 	Send 'JesterSurface.RemoveItemClientRpc()' call from the server to all clients.
 		/// </summary>
 		/// <param name="playerReference">NetworkObject reference of the player who placed the item.</param>
 		/// <param name="itemReference">NetworkObject reference of the item to place.</param>
@@ -376,7 +377,7 @@ namespace MoreCounterplay.Behaviours
 		}
 
 		/// <summary>
-		/// 	TODO.
+		/// 	Send 'JesterSurface.DropAllItemsClientRpc()' call from the server to all clients.
 		/// </summary>
 		/// <param name="playerReference">NetworkObject reference of the host, or the player who hit the Jester.</param>
 		/// <param name="hit">Whether or not the Jester was hit instead of popping by itself (to reset animations).</param>

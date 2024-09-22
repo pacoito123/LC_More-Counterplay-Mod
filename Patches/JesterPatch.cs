@@ -60,8 +60,8 @@ namespace MoreCounterplay.Patches
                         // Change behaviour state parameter to 2 to skip cranking.
                         stateIndex = 2;
 
-                        // Pop Jester on all clients.
-                        jesterSurface.PreventJesterPopClientRpc(panic: true);
+                        // Switch Jester animation state to "JesterPopUp".
+                        jesterSurface.SwitchAnimationClientRpc(panic: true);
                     }
                     break;
                 case 2:
@@ -73,8 +73,8 @@ namespace MoreCounterplay.Patches
                         // Change behaviour state parameter to 0 to prevent popping.
                         stateIndex = 0;
 
-                        // Prevent Jester from popping on all clients.
-                        jesterSurface.PreventJesterPopClientRpc();
+                        // Switch Jester animation state to "JesterPopUp", or "IdleDocile" if items will stay on its head.
+                        jesterSurface.SwitchAnimationClientRpc();
                     }
                     else
                     {
