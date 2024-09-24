@@ -107,7 +107,7 @@ namespace MoreCounterplay.Patches
         [HarmonyPrefix]
         private static void HitJester(EnemyAI __instance, PlayerControllerB playerWhoHit, int hitID = -1)
         {
-            if (!playerWhoHit.IsOwner || !MoreCounterplay.Settings.EnableJesterCounterplay) return;
+            if (playerWhoHit == null || !playerWhoHit.IsOwner || !MoreCounterplay.Settings.EnableJesterCounterplay) return;
             if (__instance.isEnemyDead || __instance.GetType() != typeof(JesterAI)) return;
 
             // Drop all items on all clients if the Jester is hit by a shovel.
