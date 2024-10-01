@@ -19,11 +19,12 @@ namespace MoreCounterplay.Patches
         {
             if (!MoreCounterplay.Settings.EnableCoilheadCounterplay) return;
             if (__instance.isEnemyDead || __instance.GetType() != typeof(SpringManAI)) return;
+            SpringManAI coilhead = (SpringManAI)__instance;
 
             // Negate damage while the Coilhead is on cooldown.
-            if (((SpringManAI)__instance).inCooldownAnimation)
+            if (coilhead.inCooldownAnimation)
             {
-                MoreCounterplay.Log($"Coilhead hit negated");
+                MoreCounterplay.Log($"Coilhead hit negated.");
                 return;
             }
 
@@ -36,12 +37,12 @@ namespace MoreCounterplay.Patches
             };
 
             // Apply damage and kill on client if health drops below zero.
-            MoreCounterplay.Log($"Coilhead hit for {force} damage on server");
-            __instance.enemyHP -= force;
-            if (__instance.enemyHP <= 0)
+            MoreCounterplay.Log($"Coilhead hit for {force} damage on server.");
+            coilhead.enemyHP -= force;
+            if (coilhead.enemyHP <= 0)
             {
-                MoreCounterplay.Log($"Coilhead killed");
-                __instance.KillEnemyOnOwnerClient(false);
+                MoreCounterplay.Log($"Coilhead killed!");
+                coilhead.KillEnemyOnOwnerClient(false);
             }
         }
 
@@ -92,22 +93,28 @@ namespace MoreCounterplay.Patches
 
             if (HeadItem.Prefab == null)
             {
-                MoreCounterplay.LogWarning("Coilhead head item did not load correctly or is missing; it will not be spawned.");
+                MoreCounterplay.LogWarning("'Coilless Coilhead' prefab did not load correctly or is missing; it will not be spawned.");
                 return null;
             }
 
             // Obtain Coilhead's head prefab.
             GameObject originalHead = coilhead.meshRenderers.First(mesh => mesh.name == "Head").gameObject;
 
-            // Create head prefab instance.
+            // Create head item instance.
             GameObject scrapHead = Object.Instantiate(HeadItem.Prefab, originalHead.transform.position, originalHead.transform.rotation);
 
-            // Spawn head network object.
-            NetworkObject networkHead = scrapHead.GetComponent<NetworkObject>();
+            // Find and obtain head item's NetworkObject and HeadItem components.
+            if (!scrapHead.TryGetComponent(out NetworkObject networkHead) || !scrapHead.TryGetComponent(out HeadItem headItem))
+            {
+                MoreCounterplay.LogWarning("'Coilless Coilhead' instance has missing components; it will not be spawned.");
+                Object.Destroy(scrapHead);
+                return null;
+            }
+
+            // Spawn head item instance on all clients.
             networkHead.Spawn();
 
-            // Assign scrap value and attach to original head.
-            HeadItem headItem = scrapHead.GetComponent<HeadItem>();
+            // Assign scrap value and attach item to original head.
             headItem.SetScrapValue(HeadItem.Random.Next(MoreCounterplay.Settings.MinHeadValue, MoreCounterplay.Settings.MaxHeadValue + 1));
             headItem.AttachItemClientRpc(coilhead.thisNetworkObject);
 
@@ -118,7 +125,7 @@ namespace MoreCounterplay.Patches
         }
 
         /// <summary>
-        ///     Ignites a given Coilhead and enables their combustion timer.
+        ///     Ignites a given Coilhead and enables their explosion timer.
         /// </summary>
         /// <param name="coilhead">The Coilhead to set on fire.</param>
         /// <param name="scrapHead">The 'Coilless Coilhead' instance to (possibly) destroy.</param>
@@ -127,16 +134,22 @@ namespace MoreCounterplay.Patches
             if (!MoreCounterplay.Settings.LoreAccurateCoilheads) return;
 
             // Enable radioactive fire particle effects.
-            coilhead.transform.Find("SpringManModel/RadioactiveFire")?.gameObject.SetActive(true);
+            coilhead.transform.Find("SpringManModel/RadioactiveFire")?.gameObject?.SetActive(true);
 
             // Activate behaviour script only when called from the server.
             if (!coilhead.IsServer && !coilhead.IsHost) return;
 
-            // Assign object references to behaviour script.
-            CoilExplosion coilExplosion = coilhead.GetComponent<CoilExplosion>();
+            // Find and obtain the given Coilhead's CoilExplosion script.
+            if (!coilhead.TryGetComponent(out CoilExplosion coilExplosion))
+            {
+                MoreCounterplay.LogWarning("Coilhead CoilExplosion script did not load correctly or is missing; explosion will not happen.");
+                return;
+            }
+
+            // Assign object reference to behaviour script.
             coilExplosion.HeadContainer = scrapHead;
 
-            // Update scan node text on clients.
+            // Update scan node text on all clients.
             coilExplosion.UpdateScanNodeClientRpc(true);
 
             // Set explosion timer to how long the Coilhead last moved for, clamped to configuration values.
@@ -149,22 +162,31 @@ namespace MoreCounterplay.Patches
         [HarmonyPostfix]
         private static void OnStartedMoving(SpringManAI __instance)
         {
+            // Enable behaviour script timer only when called from the server.
             if ((!__instance.IsServer && !__instance.IsHost) || !MoreCounterplay.Settings.LoreAccurateCoilheads) return;
 
-            // Reset timer since last stop and start updating it.
-            CoilExplosion coilExplosion = __instance.GetComponent<CoilExplosion>();
-            coilExplosion.TimeSinceLastStop = 0.0f;
-            coilExplosion.enabled = true;
+            // Try to find CoilExplosion behaviour script.
+            if (__instance.TryGetComponent(out CoilExplosion coilExplosion))
+            {
+                // Reset timer since last stop and start updating it.
+                coilExplosion.TimeSinceLastStop = 0.0f;
+                coilExplosion.enabled = true;
+            }
         }
 
         [HarmonyPatch(typeof(SpringManAI), nameof(SpringManAI.SetAnimationStopServerRpc))]
         [HarmonyPostfix]
         private static void OnStoppedMoving(SpringManAI __instance)
         {
+            // Disable behaviour script timer only when called from the server.
             if ((!__instance.IsServer && !__instance.IsHost) || !MoreCounterplay.Settings.LoreAccurateCoilheads) return;
 
-            // Stop updating time since last stop.
-            __instance.GetComponent<CoilExplosion>().enabled = false;
+            // Try to find CoilExplosion behaviour script.
+            if (__instance.TryGetComponent(out CoilExplosion coilExplosion))
+            {
+                // Stop updating time since last stop.
+                coilExplosion.enabled = false;
+            }
         }
     }
 }

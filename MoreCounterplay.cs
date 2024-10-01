@@ -4,9 +4,11 @@ using HarmonyLib;
 using MoreCounterplay.Behaviours;
 using MoreCounterplay.Config;
 using MoreCounterplay.Items;
+using MoreCounterplay.Patches;
 using System;
 using System.IO;
 using System.Reflection;
+using Unity.Netcode;
 using UnityEngine;
 
 namespace MoreCounterplay;
@@ -42,6 +44,22 @@ public class MoreCounterplay : BaseUnityPlugin
         Log($"Loading Assets...");
         Bundle = AssetBundle.LoadFromFile(Path.Combine(Path.GetDirectoryName(Info.Location), "morecounterplayassets"));
 
+        #region Jester
+        // Load Jester surface prefab.
+        GameObject jesterSurfaceContainer = Bundle.LoadAsset<GameObject>("JesterSurface.prefab");
+
+        // Add JesterSurface component to Jester surface prefab.
+        jesterSurfaceContainer.AddComponent<JesterSurface>();
+        JesterSurface.JesterSurfacePrefab = jesterSurfaceContainer;
+
+        // Register Jester surface prefab as a network prefab.
+        LethalLib.Modules.NetworkPrefabs.RegisterNetworkPrefab(jesterSurfaceContainer);
+        #endregion
+
+        #region Coilhead
+        // Load radioactive fire particle effects prefab.
+        CoilExplosion.RadioactiveFirePrefab = Bundle.LoadAsset<GameObject>("RadioactiveFire.prefab");
+
         // Load 'Coilless Coilhead' prefab.
         Item headProperties = Bundle.LoadAsset<Item>("CoillessCoilhead.asset");
 
@@ -49,12 +67,10 @@ public class MoreCounterplay : BaseUnityPlugin
         headProperties.spawnPrefab.AddComponent<HeadItem>().itemProperties = headProperties;
         HeadItem.Prefab = headProperties.spawnPrefab;
 
-        // Load radioactive fire particle effects prefab.
-        CoilExplosion.RadioactiveFirePrefab = Bundle.LoadAsset<GameObject>("RadioactiveFire.prefab");
-
-        // Register 'Coilless Coilhead' as both a plain item and a network object.
+        // Register 'Coilless Coilhead' as both a plain item and a network prefab.
         LethalLib.Modules.Items.RegisterItem(headProperties);
         LethalLib.Modules.NetworkPrefabs.RegisterNetworkPrefab(headProperties.spawnPrefab);
+        #endregion
     }
 
     internal static void Patch()
@@ -78,6 +94,7 @@ public class MoreCounterplay : BaseUnityPlugin
     }
 
     public static void Log(string message) => Logger.LogInfo(message);
+    public static void LogDebug(string message) => Logger.LogDebug(message);
     public static void LogError(string message) => Logger.LogError(message);
     public static void LogWarning(string message) => Logger.LogWarning(message);
     public static bool IsModLoaded(string guid) => BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey(guid);

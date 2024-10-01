@@ -23,7 +23,7 @@ namespace MoreCounterplay.Patches
             Object.Destroy(CoilExplosion.CoilheadPrefab?.GetComponent<CoilExplosion>());
 
             // Reset Coilhead prefab to vanilla values.
-            if (CoilExplosion.CoilheadPrefab?.TryGetComponent(out SpringManAI coilhead) ?? false)
+            if (CoilExplosion.CoilheadPrefab?.TryGetComponent(out SpringManAI coilhead) == true)
             {
                 coilhead.enemyHP = 3;
                 coilhead.enemyType.canDie = false;
@@ -81,7 +81,7 @@ namespace MoreCounterplay.Patches
                 else
                 {
                     LogWarning("Either the 'Coilless Coilhead' prefab did not load or the Coilhead enemy prefab could not be found. "
-                        + "Either way, some stuff might not load or work properly.");
+                        + "Some stuff might not load or work properly.");
                 }
             }
 
@@ -97,7 +97,7 @@ namespace MoreCounterplay.Patches
                 else
                 {
                     LogWarning("Either the 'RadioactiveFire' prefab did not load or the Forest Giant enemy prefab could not be found. "
-                        + "Either way, some stuff might not load or work properly.");
+                        + "Some stuff might not load or work properly.");
                 }
             }
 

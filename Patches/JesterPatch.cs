@@ -1,6 +1,7 @@
+using GameNetcodeStuff;
 using HarmonyLib;
-using System.Collections.Generic;
-using System.Linq;
+using MoreCounterplay.Behaviours;
+using Unity.Netcode;
 using UnityEngine;
 
 namespace MoreCounterplay.Patches
@@ -10,105 +11,126 @@ namespace MoreCounterplay.Patches
     {
         [HarmonyPatch(typeof(JesterAI), nameof(JesterAI.Start))]
         [HarmonyPostfix]
-        public static void SpawnItemsCollider(JesterAI __instance)
+        public static void OnSpawn(JesterAI __instance)
         {
-            if (!MoreCounterplay.Settings.EnableJesterCounterplay) return;
-            AddHeadCollider(__instance, "HeadCollider");
+            if ((!__instance.IsServer && !__instance.IsHost) || !MoreCounterplay.Settings.EnableJesterCounterplay) return;
+
+            if (JesterSurface.JesterSurfacePrefab == null)
+            {
+                MoreCounterplay.LogWarning("Jester surface prefab did not load correctly or is missing; its counterplay will not work.");
+                return;
+            }
+
+            // Create Jester surface prefab instance.
+            GameObject jesterSurfaceContainer = Object.Instantiate(JesterSurface.JesterSurfacePrefab);
+            jesterSurfaceContainer.name = JesterSurface.JesterSurfacePrefab.name;
+
+            if (!jesterSurfaceContainer.TryGetComponent(out NetworkObject networkSurface))
+            {
+                return;
+            }
+
+            // Spawn Jester surface NetworkObject.
+            networkSurface.Spawn();
+
+            // Set Jester surface instance as a child of its respective Jester.
+            jesterSurfaceContainer.transform.SetParent(__instance.transform, false);
         }
 
         [HarmonyPatch(typeof(EnemyAI), nameof(EnemyAI.SwitchToBehaviourState))]
         [HarmonyPrefix]
-        public static bool CheckJesterHead(EnemyAI __instance, int stateIndex)
+        public static void CheckJesterHead(EnemyAI __instance, ref int stateIndex)
         {
-            if (!MoreCounterplay.Settings.EnableJesterCounterplay) return true;
-            if (__instance.GetType() != typeof(JesterAI)) return true;
+            if ((!__instance.IsServer && !__instance.IsHost) || !MoreCounterplay.Settings.EnableJesterCounterplay) return;
+            if (__instance.GetType() != typeof(JesterAI)) return;
 
-            float weight = Mathf.RoundToInt(Mathf.Clamp(__instance.GetComponentInChildren<JesterHeadTrigger>().GetObjectsWeight(), 0f, 100f) * 105f);
+            // Find and obtain JesterSurface component.
+            if (__instance.transform.Find("JesterSurface")?.TryGetComponent(out JesterSurface jesterSurface) != true) return;
 
-            if (stateIndex == 2 && weight >= MoreCounterplay.Settings.WeightToPreventJester)
+            // Check which behaviour state the Jester is about to switch to.
+            switch (stateIndex)
             {
-                PreventJesterPopOut((JesterAI)__instance);
-                return false;
-            }
+                case 0:
+                case 1:
+                    // Pop Jester immediately if cranking while over the 'panic' threshold.
+                    if (MoreCounterplay.Settings.JesterPanicThreshold > 0 && jesterSurface.TotalWeight >= MoreCounterplay.Settings.JesterPanicThreshold)
+                    {
+                        MoreCounterplay.Log("Uh oh...");
 
-            if (stateIndex == 2 && weight < MoreCounterplay.Settings.WeightToPreventJester)
-            {
-                __instance.GetComponentInChildren<JesterHeadTrigger>().DropAllItems();
-                return true;
-            }
+                        // Change behaviour state parameter to 2 to skip cranking.
+                        stateIndex = 2;
 
-            return true;
-        }
+                        // Switch Jester animation state to "JesterPopUp".
+                        jesterSurface.SwitchAnimationClientRpc(panic: true);
+                    }
+                    break;
+                case 2:
+                    // Prevent Jester from popping if its weight goes past the 'prevent' threshold.
+                    if (MoreCounterplay.Settings.JesterPreventThreshold > 0 && jesterSurface.TotalWeight >= MoreCounterplay.Settings.JesterPreventThreshold)
+                    {
+                        MoreCounterplay.Log("Preventing Jester from popping...");
 
-        public static void PreventJesterPopOut(JesterAI __instance)
-        {
-            MoreCounterplay.Log($"Jester pop out prevented");
-            __instance.farAudio.Stop();
-            __instance.creatureAnimator.SetFloat("CrankSpeedMultiplier", 1f);
-            __instance.creatureAnimator.CrossFade(-51691287, .1f);
-            __instance.SwitchToBehaviourState(0);
-        }
+                        // Change behaviour state parameter to 0 to prevent popping.
+                        stateIndex = 0;
 
-        public static GameObject AddHeadCollider(JesterAI __instance, string name)
-        {
-            GameObject headCollider = new(name, typeof(BoxCollider));
-            headCollider.transform.SetParent(__instance.GetComponentsInChildren<Transform>().FirstOrDefault(child => child.name == "MeshContainer"));
-            headCollider.transform.localPosition = new Vector3(-.004f, 2.1f, .1171f);
-            headCollider.transform.localRotation = Quaternion.identity;
-
-            // v56 made 'GrabbableObject' items exclude the 'Colliders' layer.
-            headCollider.layer = LayerMask.NameToLayer("Enemies");
-
-            headCollider.GetComponent<BoxCollider>().center = Vector3.zero;
-            headCollider.GetComponent<BoxCollider>().size = new Vector3(.9698f, .1f, 1.4889f);
-            headCollider.GetComponent<BoxCollider>().isTrigger = true;
-            headCollider.AddComponent<JesterHeadTrigger>();
-            return headCollider;
-        }
-    }
-
-    internal class JesterHeadTrigger : MonoBehaviour
-    {
-        private readonly List<GrabbableObject> _objectsOnHead = [];
-
-        public float GetObjectsWeight()
-        {
-            float weight = 0f;
-
-            // Remove all objects that match from the list.
-            int itemsRemoved = _objectsOnHead.RemoveAll((GrabbableObject item) => item.parentObject != transform);
-            MoreCounterplay.Log($"{itemsRemoved} objects removed from Jester's head");
-
-            _objectsOnHead.ForEach(obj => weight += Mathf.Clamp(obj.itemProperties.weight - 1f, 0f, 10f));
-            return weight;
-        }
-
-        public void DropAllItems()
-        {
-            MoreCounterplay.Log($"Drop all items from Jester");
-            foreach (GrabbableObject item in _objectsOnHead)
-            {
-                _objectsOnHead.Remove(item);
-                item.FallToGround();
-                item.parentObject = null;
+                        // Switch Jester animation state to "JesterPopUp", or "IdleDocile" if items will stay on its head.
+                        jesterSurface.SwitchAnimationClientRpc();
+                    }
+                    else
+                    {
+                        // Drop all items on all clients if the Jester finished cranking while its weight is under the 'prevent' threshold.
+                        jesterSurface.DropAllItemsOnClient();
+                        jesterSurface.DropAllItemsServerRpc(GameNetworkManager.Instance.localPlayerController.GetComponent<NetworkObject>());
+                    }
+                    break;
+                default:
+                    break;
             }
         }
 
-        private void OnTriggerEnter(Collider collision)
+        [HarmonyPatch(typeof(GrabbableObject), nameof(GrabbableObject.GrabItem))]
+        [HarmonyPrefix]
+        public static void GrabItem(GrabbableObject __instance)
         {
-            if (!collision.CompareTag("PhysicsProp")) return;
+            if (!__instance.IsOwner || !MoreCounterplay.Settings.EnableJesterCounterplay) return;
 
-            if (collision.TryGetComponent(out GrabbableObject grabbableObject))
+            // Find and obtain JesterSurface component.
+            if (__instance.transform.GetParent()?.TryGetComponent(out JesterSurface jesterSurface) != true) return;
+
+            // Remove item from the Jester on all clients.
+            jesterSurface.RemoveItemOnClient(__instance);
+            jesterSurface.RemoveItemServerRpc(GameNetworkManager.Instance.localPlayerController.GetComponent<NetworkObject>(),
+                __instance.GetComponent<NetworkObject>());
+        }
+
+        [HarmonyPatch(typeof(EnemyAI), nameof(EnemyAI.HitEnemy))]
+        [HarmonyPrefix]
+        private static void HitJester(EnemyAI __instance, PlayerControllerB playerWhoHit, int hitID = -1)
+        {
+            if (playerWhoHit == null || !playerWhoHit.IsOwner || !MoreCounterplay.Settings.EnableJesterCounterplay) return;
+            if (__instance.isEnemyDead || __instance.GetType() != typeof(JesterAI)) return;
+
+            // Drop all items on all clients if the Jester is hit by a shovel.
+            if (__instance.currentBehaviourStateIndex != 2 && hitID == 1 && MoreCounterplay.Settings.DropItemsOnHit
+                && __instance.transform.Find("JesterSurface")?.TryGetComponent(out JesterSurface jesterSurface) == true)
             {
-                // Check if item is inside the ship, or on the ground. Should prevent Jester stealing items if it goes under the ship.
-                if (grabbableObject.isInShipRoom || grabbableObject.reachedFloorTarget)
-                {
-                    return;
-                }
+                jesterSurface.DropAllItemsOnClient(hit: true);
+                jesterSurface.DropAllItemsServerRpc(playerWhoHit.GetComponent<NetworkObject>(), hit: true);
+            }
+        }
 
-                MoreCounterplay.Log($"Add object to Jester's head {grabbableObject.name}");
-                grabbableObject.parentObject = transform;
-                if (!_objectsOnHead.Contains(grabbableObject)) _objectsOnHead.Add(grabbableObject);
+        [HarmonyPatch(typeof(EnemyAI), nameof(EnemyAI.KillEnemy))]
+        [HarmonyPrefix]
+        private static void KillJester(EnemyAI __instance)
+        {
+            if (!__instance.IsOwner || !MoreCounterplay.Settings.EnableJesterCounterplay) return;
+            if (__instance.isEnemyDead || __instance.GetType() != typeof(JesterAI)) return;
+
+            // Drop all items if 'EnemyAI.KillEnemy()' is ever called on a Jester (by another mod).
+            if (__instance.transform.Find("JesterSurface")?.TryGetComponent(out JesterSurface jesterSurface) == true)
+            {
+                jesterSurface.DropAllItemsOnClient(hit: true);
+                jesterSurface.DropAllItemsServerRpc(GameNetworkManager.Instance.localPlayerController.GetComponent<NetworkObject>(), hit: true);
             }
         }
     }
